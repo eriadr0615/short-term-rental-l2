@@ -28,4 +28,6 @@ Esquema de modelo de datos perteneciente a la app:
 
 Diagrama de entidad relacion
 
+![Diagrama de Entidad Relación](./DER.png)
+
 ## Base de datos
