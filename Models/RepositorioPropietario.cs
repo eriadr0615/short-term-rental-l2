@@ -125,13 +125,13 @@ namespace Inmobiliaria.Models
                     {
                         Propietario p = new Propietario
                         {
-                            IdPropietario = reader.GetInt32("id_propietario"),
-                            Dni = reader.GetString("dni"),
-                            Nombre = reader.GetString("nombre"),
-                            Apellido = reader.GetString("apellido"),
-                            Telefono = reader.IsDBNull("telefono") ? "" : reader.GetString("telefono"),
-                            Correo = reader.IsDBNull("correo") ? "" : reader.GetString("correo"),
-                            Direccion = reader.IsDBNull("direccion") ? "" : reader.GetString("direccion")
+                            IdPropietario = Convert.ToInt32(reader["id_propietario"]),
+                            Dni = reader["dni"].ToString() ?? "",
+                            Nombre = reader["nombre"].ToString() ?? "",
+                            Apellido = reader["apellido"].ToString() ?? "",
+                            Telefono = reader["telefono"].ToString() ?? "",
+                            Correo = reader["correo"].ToString() ?? "",
+                            Direccion = reader["direccion"].ToString() ?? ""
                         };
 
                         lista.Add(p);
@@ -171,13 +171,13 @@ namespace Inmobiliaria.Models
                     {
                         p = new Propietario
                         {
-                            IdPropietario = reader.GetInt32("id_propietario"),
-                            Dni = reader.GetString("dni"),
-                            Nombre = reader.GetString("nombre"),
-                            Apellido = reader.GetString("apellido"),
-                            Telefono = reader.IsDBNull("telefono") ? "" : reader.GetString("telefono"),
-                            Correo = reader.IsDBNull("correo") ? "" : reader.GetString("correo"),
-                            Direccion = reader.IsDBNull("direccion") ? "" : reader.GetString("direccion")
+                            IdPropietario = Convert.ToInt32(reader["id_propietario"]),
+                            Dni = reader["dni"].ToString() ?? "",
+                            Nombre = reader["nombre"].ToString() ?? "",
+                            Apellido = reader["apellido"].ToString() ?? "",
+                            Telefono = reader["telefono"].ToString() ?? "",
+                            Correo = reader["correo"].ToString() ?? "",
+                            Direccion = reader["direccion"].ToString() ?? ""
                         };
                     }
                 }

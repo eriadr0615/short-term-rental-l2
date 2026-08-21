@@ -124,13 +124,13 @@ namespace Inmobiliaria.Models
                     {
                         Inquilino i = new Inquilino
                         {
-                            IdInquilino = reader.GetInt32("id_inquilino"),
-                            Dni = reader.GetString("dni"),
-                            Nombre = reader.GetString("nombre"),
-                            Apellido = reader.GetString("apellido"),
-                            Telefono = reader.IsDBNull("telefono") ? "" : reader.GetString("telefono"),
-                            Correo = reader.IsDBNull("correo") ? "" : reader.GetString("correo"),
-                            Direccion = reader.IsDBNull("direccion") ? "" : reader.GetString("direccion")
+                            IdInquilino = Convert.ToInt32(reader["id_inquilino"]),
+                            Dni = reader["dni"].ToString() ?? "",
+                            Nombre = reader["nombre"].ToString() ?? "",
+                            Apellido = reader["apellido"].ToString() ?? "",
+                            Telefono = reader["telefono"].ToString() ?? "",
+                            Correo = reader["correo"].ToString() ?? "",
+                            Direccion = reader["direccion"].ToString() ?? ""
                         };
 
                         lista.Add(i);
@@ -170,13 +170,13 @@ namespace Inmobiliaria.Models
                     {
                         i = new Inquilino
                         {
-                            IdInquilino = reader.GetInt32("id_inquilino"),
-                            Dni = reader.GetString("dni"),
-                            Nombre = reader.GetString("nombre"),
-                            Apellido = reader.GetString("apellido"),
-                            Telefono = reader.IsDBNull("telefono") ? "" : reader.GetString("telefono"),
-                            Correo = reader.IsDBNull("correo") ? "" : reader.GetString("correo"),
-                            Direccion = reader.IsDBNull("direccion") ? "" : reader.GetString("direccion")
+                            IdInquilino = Convert.ToInt32(reader["id_inquilino"]),
+                            Dni = reader["dni"].ToString() ?? "",
+                            Nombre = reader["nombre"].ToString() ?? "",
+                            Apellido = reader["apellido"].ToString() ?? "",
+                            Telefono = reader["telefono"].ToString() ?? "",
+                            Correo = reader["correo"].ToString() ?? "",
+                            Direccion = reader["direccion"].ToString() ?? ""
                         };
                     }
                 }

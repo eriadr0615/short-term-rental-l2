@@ -1,4 +1,9 @@
+using Inmobiliaria.Models;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IRepositorioPropietario, RepositorioPropietario>();
+builder.Services.AddScoped<IRepositorioInquilino, RepositorioInquilino>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
