@@ -1,0 +1,33 @@
+# Carpetas de compilación y binarios
+[Bb]in/
+[Oo]bj/
+x64/
+x86/
+[Dd]ebug/
+[Rr]elease/
+
+# Archivos específicos del usuario y temporales de Visual Studio
+.vs/
+*.user
+*.suo
+*.rsuser
+*.userosscache
+*.sln.docstates
+
+# Archivos temporales de Visual Studio Code
+.vscode/
+
+# Paquetes NuGet
+*.nupkg
+packages/
+
+# Archivos de configuración locales que no deben subirse
+appsettings.Development.json
+Web.Debug.config
+
+# Logs y caches
+[Ll]og/
+*.log
+*.cache
+appsettings.json
+appsettings.Development.json
