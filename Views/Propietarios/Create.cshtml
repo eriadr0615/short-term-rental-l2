@@ -1,0 +1,40 @@
+@model Inmobiliaria.Models.Propietario
+
+<h1>Nuevo propietario</h1>
+
+<form asp-action="Create" method="post">
+
+    <div class="mb-3">
+        <label asp-for="Dni"></label>
+        <input asp-for="Dni" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Apellido"></label>
+        <input asp-for="Apellido" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Telefono"></label>
+        <input asp-for="Telefono" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Correo"></label>
+        <input asp-for="Correo" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Direccion"></label>
+        <input asp-for="Direccion" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>

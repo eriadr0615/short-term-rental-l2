@@ -51,12 +51,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvcGlldGFyaW9zXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/erica/Desktop/ULP/Laboratorio II 2/proyecto_inmobiliaria/short-term-rental-l2/Views/Propietarios/Delete.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvcGlldGFyaW9zXERlbGV0ZS5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/erica/Desktop/ULP/Laboratorio II 2/proyecto_inmobiliaria/short-term-rental-l2/Views/Propietarios/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvcGlldGFyaW9zXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/erica/Desktop/ULP/Laboratorio II 2/proyecto_inmobiliaria/short-term-rental-l2/Views/Propietarios/Eliminar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvcGlldGFyaW9zXEVsaW1pbmFyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/erica/Desktop/ULP/Laboratorio II 2/proyecto_inmobiliaria/short-term-rental-l2/Views/Propietarios/Index.cshtml]
