@@ -6,13 +6,14 @@ x86/
 [Dd]ebug/
 [Rr]elease/
 
-# Archivos específicos del usuario y temporales de Visual Studio
+# Archivos específicos  y temporales de Visual Studio
 .vs/
 *.user
 *.suo
 *.rsuser
 *.userosscache
 *.sln.docstates
+appsettings.Development.json
 
 # Archivos temporales de Visual Studio Code
 .vscode/
