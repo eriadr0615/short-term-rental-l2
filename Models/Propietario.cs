@@ -6,18 +6,18 @@ namespace Inmobiliaria.Models
     {
         public int IdPropietario { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "el dni es obligatorio")]
         public string Dni { get; set; } = "";
 
-        [Required]
+        [Required(ErrorMessage = "el nombre es obligatorio")]
         public string Nombre { get; set; } = "";
 
-        [Required]
+        [Required(ErrorMessage = "el apellido es obligatorio")]
         public string Apellido { get; set; } = "";
 
         public string Telefono { get; set; } = "";
 
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "correo invalido")]
         public string Correo { get; set; } = "";
 
         public string Direccion { get; set; } = "";

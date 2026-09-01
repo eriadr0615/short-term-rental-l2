@@ -57,7 +57,7 @@ namespace Inmobiliaria.Controllers
                 return NotFound();
             }
 
-            return View("~/Views/Inquilino/Edit.cshtml", inquilino);
+            return View("~/Views/Inquilino/Edit.cshtml", inquilino);    
         }
 
         [HttpPost]
