@@ -1,0 +1,25 @@
+@model Inmobiliaria.Models.TipoInmueble
+
+<h1>Ingresar un nuevo tipo de inmueble</h1>
+
+<form asp-action="Create" method="post">
+
+    <div class="form-group">
+        <label asp-for="NombreTipo"></label>
+
+        <input asp-for="NombreTipo" class="form-control" />
+
+        <span asp-validation-for="NombreTipo" class="text-danger"></span>
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-primary">
+        Guardar
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+
+</form>
