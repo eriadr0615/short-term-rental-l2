@@ -1,10 +1,14 @@
 using Inmobiliaria.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
+//inyeccion de dependiencias
 builder.Services.AddScoped<IRepositorioPropietario, RepositorioPropietario>();
 builder.Services.AddScoped<IRepositorioInquilino, RepositorioInquilino>();
 builder.Services.AddScoped<IRepositorioTipoInmueble, RepositorioTipoInmueble>();
+
+builder.Services.AddScoped<IRepositorioInmueble, RepositorioInmueble>();
+
+
 
 builder.Services.AddControllersWithViews();
 

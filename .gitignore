@@ -6,7 +6,7 @@ x86/
 [Dd]ebug/
 [Rr]elease/
 
-# Archivos específicos  y temporales de Visual Studio
+# Archivos especificos  y temporales de VS
 .vs/
 *.user
 *.suo
@@ -15,7 +15,7 @@ x86/
 *.sln.docstates
 appsettings.Development.json
 
-# Archivos temporales de Visual Studio Code
+# Archivos temporales de VS
 .vscode/
 
 # Paquetes NuGet
