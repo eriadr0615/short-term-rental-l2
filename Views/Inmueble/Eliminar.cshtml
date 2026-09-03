@@ -1,0 +1,20 @@
+@model Inmobiliaria.Models.Inmueble
+
+<h1>Eliminar un inmueble</h1>
+
+<p> Esta seguro que desea eliminar este inmueble?</p>
+
+<p><strong>@Model.DireccionInmueble</strong></p>
+
+<form asp-action="EliminarConfirmado" method="post">
+
+    <input type="hidden" name="id" value="@Model.IdInmueble" />
+
+    <button type="submit" class="btn btn-danger">
+        Eliminar
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>
