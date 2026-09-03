@@ -89,7 +89,7 @@ CREATE TABLE Reserva (
     fecha_fin_original DATE NOT NULL,
     monto_dia DECIMAL(12,2) NOT NULL,
     fecha_finalizacion_anticipada DATE NULL,
-    id_usuario_creacion INT NOT NULL,
+    id_usuario_creacion INT NULL,
     id_usuario_finalizacion INT NULL,
     id_reserva_origen INT NULL,
 
