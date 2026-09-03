@@ -49,6 +49,13 @@ namespace Inmobiliaria.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Reserva reserva)
         {
+            if (reserva.FechaFinOriginal <= reserva.FechaInicio)
+            {
+                ModelState.AddModelError(
+                    nameof(Reserva.FechaFinOriginal),
+                    "La fecha de fin debe ser posterior a la fecha de inicio.");
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Inquilinos = repositorioInquilino.ObtenerLista();
@@ -83,6 +90,13 @@ namespace Inmobiliaria.Controllers
             if (id != reserva.IdReserva)
             {
                 return BadRequest();
+            }
+
+            if (reserva.FechaFinOriginal <= reserva.FechaInicio)
+            {
+                ModelState.AddModelError(
+                    nameof(Reserva.FechaFinOriginal),
+                    "La fecha de fin debe ser posterior a la fecha de inicio.");
             }
 
             if (!ModelState.IsValid)
