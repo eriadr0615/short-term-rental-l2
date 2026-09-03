@@ -1,0 +1,85 @@
+@model Inmobiliaria.Models.Inmueble
+
+@{
+    var propietarios = ViewBag.Propietarios as IList<Inmobiliaria.Models.Propietario>;
+    var tipos = ViewBag.TiposInmueble as IList<Inmobiliaria.Models.TipoInmueble>;
+}
+
+<h1>Nuevo inmueble</h1>
+
+<div asp-validation-summary="All"></div>
+
+
+<form asp-action="Create" method="post">
+
+    <div class="form-group">
+        <label>Propietario</label>
+
+        <select asp-for="IdPropietario" class="form-control">
+            <option value="">Seleccione de la lista, el propietario</option>
+
+            @foreach (var propietario in propietarios)
+            {
+                <option value="@propietario.IdPropietario">
+                    @propietario.Nombre @propietario.Apellido
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DireccionInmueble"></label>
+        <input asp-for="DireccionInmueble" class="form-control" />
+        <span asp-validation-for="DireccionInmueble"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Tipo de inmueble</label>
+
+        <select asp-for="IdTipoInmueble" class="form-control">
+            <option value="">Seleccione un tipo de inmueble</option>
+
+            @foreach (var tipo in tipos)
+            {
+                <option value="@tipo.IdTipoInmueble">
+                    @tipo.NombreTipo
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CoordenadasInmuebles"></label>
+        <input asp-for="CoordenadasInmuebles" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PrecioDiario"></label>
+        <input asp-for="PrecioDiario" class="form-control" placeholder="Ingrese solo el numero. Ej: 30000" />
+        <span asp-validation-for="PrecioDiario"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PorcentajeReserva"></label>
+        <input asp-for="PorcentajeReserva" class="form-control" placeholder="Ingrese solo el numero. Ej: 5" />
+        <span asp-validation-for="PorcentajeReserva"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CapacidadMaxima"></label>
+        <input asp-for="CapacidadMaxima" class="form-control" placeholder="Ingrese solo el numero. Ej: 2" />
+        <span asp-validation-for="CapacidadMaxima"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Disponible"></label>
+        <input asp-for="Disponible" type="checkbox" />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">
+        Guardar
+    </button>
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>

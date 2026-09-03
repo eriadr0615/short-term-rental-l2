@@ -9,4 +9,4 @@ namespace Inmobiliaria.Models
         [Required(ErrorMessage = "dato obligatorio. Ingrese el tipo de inmueble")]
         public string NombreTipo { get; set; } = "";
     }
-}
+} 

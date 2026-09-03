@@ -24,5 +24,31 @@ namespace Inmobiliaria.Controllers
             var lista = repositorio.ObtenerLista();
             return View(lista);
         }
+
+          public IActionResult Create()
+        {
+            ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
+            ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Inmueble inmueble)
+        {
+            if (ModelState.IsValid)
+            {
+                repositorio.Alta(inmueble);
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
+            ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
+
+            return View(inmueble);
+        }
+
+
+
     }
 }
