@@ -19,19 +19,22 @@
         {
             <tr>
                 <td>@item.NombreTipo</td>
-
                 <td>
+                    <a asp-action="Details" asp-route-id="@item.IdTipoInmueble">
+                        Detalle
+                    </a>
+                    |
                     <a asp-action="Edit" asp-route-id="@item.IdTipoInmueble">
                         Modificar
                     </a>
-
                     |
-
                     <a asp-action="Eliminar" asp-route-id="@item.IdTipoInmueble">
                         Eliminar
                     </a>
                 </td>
             </tr>
+
+
         }
     </tbody>
 </table>

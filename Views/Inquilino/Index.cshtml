@@ -23,21 +23,23 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model)
-{
-        <tr>
-            <td>@Html.DisplayFor(modelItem => item.Dni)</td>
-            <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
-            <td>@Html.DisplayFor(modelItem => item.Apellido)</td>
-            <td>@Html.DisplayFor(modelItem => item.Telefono)</td>
-            <td>@Html.DisplayFor(modelItem => item.Correo)</td>
-            <td>@Html.DisplayFor(modelItem => item.Direccion)</td>
-            <td class="text-nowrap">
-                <a asp-action="Details" asp-route-id="@item.IdInquilino">Detalle</a> |
-                <a asp-action="Edit" asp-route-id="@item.IdInquilino">Editar</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdInquilino">Eliminar</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Dni)</td>
+                <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
+                <td>@Html.DisplayFor(modelItem => item.Apellido)</td>
+                <td>@Html.DisplayFor(modelItem => item.Telefono)</td>
+                <td>@Html.DisplayFor(modelItem => item.Correo)</td>
+                <td>@Html.DisplayFor(modelItem => item.Direccion)</td>
+                <td class="text-nowrap">
+                    <a asp-action="Details" asp-route-id="@item.IdInquilino" class="btn btn-secondary">Detalle</a> |
+                    <a asp-action="Edit" asp-route-id="@item.IdInquilino" class="btn btn-warning">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdInquilino" class="btn btn-danger">Eliminar</a>
+                </td>
+            </tr>
+
+        
+        }
     </tbody>
 </table>

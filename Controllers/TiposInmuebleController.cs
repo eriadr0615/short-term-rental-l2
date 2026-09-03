@@ -80,5 +80,14 @@ namespace Inmobiliaria.Controllers
             repositorio.Baja(id);
             return RedirectToAction("Index");
         }
+
+        public IActionResult Details(int id)
+        {
+            var tipo = repositorio.ObtenerPorId(id);
+            if (tipo == null)
+                return NotFound();
+            return View(tipo);
+        }
+
     }
 }

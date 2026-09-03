@@ -27,15 +27,15 @@
         @foreach (var item in Model)
         {
             //se agrega de esta forma p/visualizar el tipo de inmueble en detalles, resolver mas formal posteriormente
-                var nombreTipo = "";
+            var nombreTipo = "";
 
-                        foreach (var tipo in tipos)
-                        {
-                            if (tipo.IdTipoInmueble == item.IdTipoInmueble)
-                            {
-                                nombreTipo = tipo.NombreTipo;
-                            }
-                        }
+            foreach (var tipo in tipos)
+            {
+                if (tipo.IdTipoInmueble == item.IdTipoInmueble)
+                {
+                    nombreTipo = tipo.NombreTipo;
+                }
+            }
 
             <tr>
                 <td>@nombreTipo</td>
@@ -45,6 +45,9 @@
                 <td>@item.Disponible</td>
 
                 <td>
+                    <a asp-action="Details" asp-route-id="@item.IdInmueble">
+                        Detalle
+                    </a> -
                     <a asp-action="Edit" asp-route-id="@item.IdInmueble">
                         Modificar
                     </a>
@@ -56,6 +59,8 @@
             </tr>
 
 
+        
+        
         }
     </tbody>
 </table>

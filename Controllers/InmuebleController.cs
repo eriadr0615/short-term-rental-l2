@@ -44,7 +44,6 @@ namespace Inmobiliaria.Controllers
 
             ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
-
             return View(inmueble);
         }
 
@@ -52,13 +51,10 @@ namespace Inmobiliaria.Controllers
         public IActionResult Edit(int id)
         {
             var inmueble = repositorio.ObtenerPorId(id);
-
             if (inmueble == null)
                 return NotFound();
-
             ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
-
             return View(inmueble);
         }
 
@@ -70,7 +66,6 @@ namespace Inmobiliaria.Controllers
                 repositorio.Modificacion(inmueble);
                 return RedirectToAction("Index");
             }
-
             ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
 
@@ -80,10 +75,8 @@ namespace Inmobiliaria.Controllers
         public IActionResult Eliminar(int id)
         {
             var inmueble = repositorio.ObtenerPorId(id);
-
             if (inmueble == null)
                 return NotFound();
-
             return View(inmueble);
         }
 
@@ -93,5 +86,14 @@ namespace Inmobiliaria.Controllers
             repositorio.Baja(id);
             return RedirectToAction("Index");
         }
+
+        public IActionResult Details(int id)
+        {
+            var inmueble = repositorio.ObtenerPorId(id);
+            if (inmueble == null)
+                return NotFound();
+            return View(inmueble);
+        }
+
     }
 }
