@@ -1,9 +1,4 @@
--- ============================================================
--- Proyecto Reservas Temporales - Inmobiliaria
--- Base de datos: MySQL
--- Primera entrega: ABM de Propietarios e Inquilinos
--- El esquema incluye el modelo completo definido en el DER.
--- ============================================================
+
 
 DROP DATABASE IF EXISTS reservas_temporales;
 CREATE DATABASE reservas_temporales
@@ -12,9 +7,7 @@ CREATE DATABASE reservas_temporales
 
 USE reservas_temporales;
 
--- ============================================================
--- TABLAS PRINCIPALES
--- ============================================================
+
 
 CREATE TABLE Propietario (
     id_propietario INT AUTO_INCREMENT PRIMARY KEY,
@@ -160,18 +153,16 @@ CREATE TABLE Pago (
         ON DELETE RESTRICT
 );
 
--- ============================================================
--- DATOS INICIALES
--- ============================================================
 
--- Tipos de inmueble mencionados en la narrativa
+
+
 INSERT INTO TipoInmueble (nombre_tipo) VALUES
 ('Casa'),
 ('Departamento'),
 ('Monoambiente'),
 ('Loft');
 
--- Datos de prueba para la primera entrega
+
 INSERT INTO Propietario
 (dni, nombre, apellido, telefono, correo, direccion)
 VALUES
@@ -184,9 +175,7 @@ VALUES
 ('35111444', 'Martin', 'Lopez', '2664000003', 'martin.lopez@ejemplo.com', 'San Luis'),
 ('37111555', 'Sofia', 'Fernandez', '2664000004', 'sofia.fernandez@ejemplo.com', 'Juana Koslay');
 
--- ============================================================
--- CONSULTAS DE VERIFICACION
--- ============================================================
+
 
 SELECT * FROM Propietario;
 SELECT * FROM Inquilino;

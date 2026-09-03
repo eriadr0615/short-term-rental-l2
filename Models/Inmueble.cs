@@ -24,7 +24,7 @@ namespace Inmobiliaria.Models
 
         public bool Disponible { get; set; }
 
-        [Required(ErrorMessage = "Ingrese la capacidad máxima")]
+        [Required(ErrorMessage = "Ingrese la capacidad maxima del inmueble")]
         public int CapacidadMaxima { get; set; }
     }
 }

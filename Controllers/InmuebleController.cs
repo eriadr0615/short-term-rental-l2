@@ -22,6 +22,7 @@ namespace Inmobiliaria.Controllers
         public IActionResult Index()
         {
             var lista = repositorio.ObtenerLista();
+            ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
             return View(lista);
         }
 

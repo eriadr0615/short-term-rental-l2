@@ -1,5 +1,10 @@
 @model IEnumerable<Inmobiliaria.Models.Inmueble>
 
+@{
+    var tipos = ViewBag.TiposInmueble as IList<Inmobiliaria.Models.TipoInmueble>;
+}
+
+
 <h1>Inmuebles</h1>
 
 <p>
@@ -9,6 +14,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Tipo de inmueble</th>
             <th>Direccion</th>
             <th>Capacidad</th>
             <th>Precio de estadia diario</th>
@@ -20,7 +26,19 @@
     <tbody>
         @foreach (var item in Model)
         {
+            //se agrega de esta forma p/visualizar el tipo de inmueble en detalles, resolver mas formal posteriormente
+                var nombreTipo = "";
+
+                        foreach (var tipo in tipos)
+                        {
+                            if (tipo.IdTipoInmueble == item.IdTipoInmueble)
+                            {
+                                nombreTipo = tipo.NombreTipo;
+                            }
+                        }
+
             <tr>
+                <td>@nombreTipo</td>
                 <td>@item.DireccionInmueble</td>
                 <td>@item.CapacidadMaxima</td>
                 <td>@item.PrecioDiario</td>
@@ -30,14 +48,14 @@
                     <a asp-action="Edit" asp-route-id="@item.IdInmueble">
                         Modificar
                     </a>
-
-                   - 
-
+                    -
                     <a asp-action="Eliminar" asp-route-id="@item.IdInmueble">
                         Eliminar
                     </a>
                 </td>
             </tr>
+
+
         }
     </tbody>
 </table>
