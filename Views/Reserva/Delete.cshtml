@@ -1,0 +1,30 @@
+@model Inmobiliaria.Models.Reserva
+
+@{
+    ViewData["Title"] = "Eliminar reserva";
+}
+
+<h1>Eliminar reserva</h1>
+
+<h3>¿Seguro que desea eliminar esta reserva?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Inquilino</dt>
+        <dd class="col-sm-10">@Model.IdInquilino</dd>
+        <dt class="col-sm-2">Inmueble</dt>
+        <dd class="col-sm-10">@Model.IdInmueble</dd>
+        <dt class="col-sm-2">Fecha de inicio</dt>
+        <dd class="col-sm-10">@Model.FechaInicio.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-2">Fecha de fin</dt>
+        <dd class="col-sm-10">@Model.FechaFinOriginal.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-2">Monto por día</dt>
+        <dd class="col-sm-10">@Model.MontoDia</dd>
+    </dl>
+
+    <form asp-action="Delete" asp-route-id="@Model.IdReserva" method="post">
+        <input type="hidden" asp-for="IdReserva" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+    </form>
+</div>

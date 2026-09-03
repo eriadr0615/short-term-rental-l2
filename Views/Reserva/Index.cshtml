@@ -1,0 +1,41 @@
+@model IEnumerable<Inmobiliaria.Models.Reserva>
+
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<h1>Reservas</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva reserva</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Inquilino</th>
+            <th>Inmueble</th>
+            <th>Fecha de inicio</th>
+            <th>Fecha de fin</th>
+            <th>Monto por día</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>@item.IdInquilino</td>
+            <td>@item.IdInmueble</td>
+            <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
+            <td>@item.FechaFinOriginal.ToString("dd/MM/yyyy")</td>
+            <td>@item.MontoDia</td>
+            <td class="text-nowrap">
+                <a asp-action="Details" asp-route-id="@item.IdReserva">Detalle</a> |
+                <a asp-action="Edit" asp-route-id="@item.IdReserva">Editar</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdReserva">Eliminar</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
