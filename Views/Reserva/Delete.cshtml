@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Eliminar reserva";
+    var inquilino = ViewBag.Inquilino as Inmobiliaria.Models.Inquilino;
+    var inmueble = ViewBag.Inmueble as Inmobiliaria.Models.Inmueble;
 }
 
 <h1>Eliminar reserva</h1>
@@ -11,9 +13,13 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">Inquilino</dt>
-        <dd class="col-sm-10">@Model.IdInquilino</dd>
+        <dd class="col-sm-10">
+            @(inquilino == null ? "No encontrado" : $"{inquilino.Nombre} {inquilino.Apellido}")
+        </dd>
         <dt class="col-sm-2">Inmueble</dt>
-        <dd class="col-sm-10">@Model.IdInmueble</dd>
+        <dd class="col-sm-10">
+            @(inmueble == null ? "No encontrado" : inmueble.DireccionInmueble)
+        </dd>
         <dt class="col-sm-2">Fecha de inicio</dt>
         <dd class="col-sm-10">@Model.FechaInicio.ToString("dd/MM/yyyy")</dd>
         <dt class="col-sm-2">Fecha de fin</dt>

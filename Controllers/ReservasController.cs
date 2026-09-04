@@ -22,6 +22,9 @@ namespace Inmobiliaria.Controllers
         public IActionResult Index()
         {
             var lista = repositorio.ObtenerLista();
+            ViewBag.Inquilinos = repositorioInquilino.ObtenerLista();
+            ViewBag.Inmuebles = repositorioInmueble.ObtenerLista();
+
             return View("~/Views/Reserva/Index.cshtml", lista);
         }
 
@@ -33,6 +36,9 @@ namespace Inmobiliaria.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.Inquilino = repositorioInquilino.ObtenerPorId(reserva.IdInquilino);
+            ViewBag.Inmueble = repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
 
             return View("~/Views/Reserva/Details.cshtml", reserva);
         }
@@ -54,6 +60,17 @@ namespace Inmobiliaria.Controllers
                 ModelState.AddModelError(
                     nameof(Reserva.FechaFinOriginal),
                     "La fecha de fin debe ser posterior a la fecha de inicio.");
+            }
+
+            if (ModelState.IsValid && repositorio.ExisteSuperposicion(
+                    reserva.IdInmueble,
+                    reserva.FechaInicio,
+                    reserva.FechaFinOriginal,
+                    null))
+            {
+                ModelState.AddModelError(
+                    nameof(Reserva.IdInmueble),
+                    "El inmueble ya tiene una reserva en ese período.");
             }
 
             if (!ModelState.IsValid)
@@ -99,6 +116,17 @@ namespace Inmobiliaria.Controllers
                     "La fecha de fin debe ser posterior a la fecha de inicio.");
             }
 
+            if (ModelState.IsValid && repositorio.ExisteSuperposicion(
+                    reserva.IdInmueble,
+                    reserva.FechaInicio,
+                    reserva.FechaFinOriginal,
+                    reserva.IdReserva))
+            {
+                ModelState.AddModelError(
+                    nameof(Reserva.IdInmueble),
+                    "El inmueble ya tiene una reserva en ese período.");
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Inquilinos = repositorioInquilino.ObtenerLista();
@@ -119,6 +147,9 @@ namespace Inmobiliaria.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.Inquilino = repositorioInquilino.ObtenerPorId(reserva.IdInquilino);
+            ViewBag.Inmueble = repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
 
             return View("~/Views/Reserva/Delete.cshtml", reserva);
         }

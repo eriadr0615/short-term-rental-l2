@@ -237,5 +237,41 @@ namespace Inmobiliaria.Models
 
             return reserva;
         }
+
+        public bool ExisteSuperposicion(
+            int idInmueble,
+            DateTime fechaInicio,
+            DateTime fechaFin,
+            int? idReservaExcluir)
+        {
+            bool existe = false;
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"SELECT COUNT(*)
+                               FROM Reserva
+                               WHERE id_inmueble = @idInmueble
+                                 AND fecha_inicio < @fechaFin
+                                 AND fecha_fin_original > @fechaInicio
+                                 AND (@idReservaExcluir IS NULL
+                                      OR id_reserva <> @idReservaExcluir)";
+
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@idInmueble", idInmueble);
+                    command.Parameters.AddWithValue("@fechaInicio", fechaInicio);
+                    command.Parameters.AddWithValue("@fechaFin", fechaFin);
+                    command.Parameters.AddWithValue(
+                        "@idReservaExcluir",
+                        (object?)idReservaExcluir ?? DBNull.Value);
+
+                    connection.Open();
+
+                    existe = Convert.ToInt32(command.ExecuteScalar()) > 0;
+                }
+            }
+
+            return existe;
+        }
     }
 }

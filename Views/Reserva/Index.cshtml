@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "Reservas";
+    var inquilinos = ViewBag.Inquilinos as IList<Inmobiliaria.Models.Inquilino>
+        ?? new List<Inmobiliaria.Models.Inquilino>();
+    var inmuebles = ViewBag.Inmuebles as IList<Inmobiliaria.Models.Inmueble>
+        ?? new List<Inmobiliaria.Models.Inmueble>();
 }
 
 <h1>Reservas</h1>
@@ -24,9 +28,12 @@
     <tbody>
 @foreach (var item in Model)
 {
+        var inquilino = inquilinos.FirstOrDefault(i => i.IdInquilino == item.IdInquilino);
+        var inmueble = inmuebles.FirstOrDefault(i => i.IdInmueble == item.IdInmueble);
+
         <tr>
-            <td>@item.IdInquilino</td>
-            <td>@item.IdInmueble</td>
+            <td>@(inquilino == null ? "No encontrado" : $"{inquilino.Nombre} {inquilino.Apellido}")</td>
+            <td>@(inmueble == null ? "No encontrado" : inmueble.DireccionInmueble)</td>
             <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
             <td>@item.FechaFinOriginal.ToString("dd/MM/yyyy")</td>
             <td>@item.MontoDia</td>
