@@ -59,7 +59,7 @@ namespace Inmobiliaria.Controllers
             {
                 ModelState.AddModelError(
                     nameof(Reserva.FechaFinOriginal),
-                    "La fecha de fin debe ser posterior a la fecha de inicio.");
+                    "Che, el día de finalización debe ser posterior al día de inicio.");
             }
 
             if (ModelState.IsValid && repositorio.ExisteSuperposicion(
@@ -113,7 +113,7 @@ namespace Inmobiliaria.Controllers
             {
                 ModelState.AddModelError(
                     nameof(Reserva.FechaFinOriginal),
-                    "La fecha de fin debe ser posterior a la fecha de inicio.");
+                    "Che, el día de finalización debe ser posterior al día de inicio.");
             }
 
             if (ModelState.IsValid && repositorio.ExisteSuperposicion(
