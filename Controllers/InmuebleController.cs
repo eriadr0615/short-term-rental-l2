@@ -8,21 +8,26 @@ namespace Inmobiliaria.Controllers
         private readonly IRepositorioInmueble repositorio;
         private readonly IRepositorioPropietario repositorioPropietario;
         private readonly IRepositorioTipoInmueble repositorioTipoInmueble;
+        private readonly IRepositorioImagenInmueble repositorioImagen;
 
         public InmuebleController(
             IRepositorioInmueble repositorio,
             IRepositorioPropietario repositorioPropietario,
-            IRepositorioTipoInmueble repositorioTipoInmueble)
+            IRepositorioTipoInmueble repositorioTipoInmueble,
+            IRepositorioImagenInmueble repositorioImagen)
         {
             this.repositorio = repositorio;
             this.repositorioPropietario = repositorioPropietario;
             this.repositorioTipoInmueble = repositorioTipoInmueble;
+            this.repositorioImagen = repositorioImagen;
         }
 
         public IActionResult Index()
         {
             var lista = repositorio.ObtenerLista();
+
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
+
             return View(lista);
         }
 
@@ -30,6 +35,7 @@ namespace Inmobiliaria.Controllers
         {
             ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
+
             return View();
         }
 
@@ -39,22 +45,28 @@ namespace Inmobiliaria.Controllers
             if (ModelState.IsValid)
             {
                 repositorio.Alta(inmueble);
+
                 return RedirectToAction("Index");
             }
 
             ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
+
             return View(inmueble);
         }
-
 
         public IActionResult Edit(int id)
         {
             var inmueble = repositorio.ObtenerPorId(id);
+
             if (inmueble == null)
+            {
                 return NotFound();
+            }
+
             ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
+
             return View(inmueble);
         }
 
@@ -64,8 +76,10 @@ namespace Inmobiliaria.Controllers
             if (ModelState.IsValid)
             {
                 repositorio.Modificacion(inmueble);
+
                 return RedirectToAction("Index");
             }
+
             ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
 
@@ -75,8 +89,12 @@ namespace Inmobiliaria.Controllers
         public IActionResult Eliminar(int id)
         {
             var inmueble = repositorio.ObtenerPorId(id);
+
             if (inmueble == null)
+            {
                 return NotFound();
+            }
+
             return View(inmueble);
         }
 
@@ -84,17 +102,22 @@ namespace Inmobiliaria.Controllers
         public IActionResult EliminarConfirmado(int id)
         {
             repositorio.Baja(id);
+
             return RedirectToAction("Index");
         }
 
         public IActionResult Details(int id)
         {
             var inmueble = repositorio.ObtenerPorId(id);
+
             if (inmueble == null)
+            {
                 return NotFound();
+            }
+
+            ViewBag.Imagenes = repositorioImagen.ObtenerPorInmueble(id);
+
             return View(inmueble);
         }
-
     }
 }
-

@@ -11,7 +11,7 @@ builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
 builder.Services.AddScoped<IRepositorioImagenInmueble, RepositorioImagenInmueble>();
 
- 
+
 
 builder.Services.AddControllersWithViews();
 
@@ -40,10 +40,3 @@ app.MapControllerRoute(
 
 app.Run();
 
-internal class RepositorioReserva
-{
-}
-
-internal interface IRepositorioReserva
-{
-}

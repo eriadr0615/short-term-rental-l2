@@ -1,17 +1,70 @@
-@model Inmobiliaria.Models.Inmueble
+@using Inmobiliaria.Models
+@model Inmueble
 
 <h1>Caracteristicas del inmueble - Detalles:</h1>
 
 <p><strong>Direccion:</strong> @Model.DireccionInmueble</p>
-
 <p><strong>Capacidad maxima:</strong> @Model.CapacidadMaxima</p>
-
 <p><strong>Precio por noche:</strong> @Model.PrecioDiario</p>
-
 <p><strong>Porcentaje de reserva:</strong> @Model.PorcentajeReserva</p>
-
 <p><strong>Coordenadas:</strong> @Model.CoordenadasInmuebles</p>
-
 <p><strong>Disponible:</strong> @Model.Disponible</p>
 
-<a asp-action="Index">Regresar</a>
+<hr />
+
+<h3>Imagenes del inmueble</h3>
+
+<p>
+    <strong>Inmueble:</strong>
+    @Model.IdInmueble - @Model.DireccionInmueble
+</p>
+
+@{
+    var imagenes = ViewBag.Imagenes as IList<ImagenInmueble>;
+}
+
+@if (imagenes != null && imagenes.Count > 0)
+{
+    @foreach (var img in imagenes)
+    {
+        <div style="margin-bottom:15px;">
+            <img src="@img.UrlImg" alt="Imagen del inmueble" style="width:220px; height:150px; object-fit:cover;" />
+            @if (img.EsPrincipal)
+            {
+                <p><strong>Imagen de portada</strong></p>
+            }
+        </div>
+    }
+}
+else
+{
+    <p>Este inmueble aún no posee imagenes para mostrar</p>
+}
+
+<hr />
+
+<h3>Agregar imagen</h3>
+<h4>Formatos esperados: .jpg,.jpeg,.png,.webp</h4>
+<form asp-controller="ImagenInmueble" asp-action="Alta" method="post" enctype="multipart/form-data">
+
+    <input type="hidden" name="idInmueble" value="@Model.IdInmueble" />
+    <div>
+        <label>Seleccionar imagen</label>
+        <input type="file" name="imagen" accept=".jpg,.jpeg,.png,.webp" required />
+    </div>
+
+    <div>
+        <label>
+            <input type="checkbox" name="esPrincipal" value="true" />
+            Usar como imagen de portada
+        </label>
+    </div>
+
+    <br />
+
+    <button type="submit">
+        Enviar imagen
+    </button>
+</form>
+<br />
+<a asp-action="Index">Volver</a>

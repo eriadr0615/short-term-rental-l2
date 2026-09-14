@@ -64,7 +64,12 @@ namespace Inmobiliaria.Controllers
             };
 
             repositorio.Alta(nuevaImagen);
-            return Ok(nuevaImagen);
+            return RedirectToAction(
+                    "Details",
+                    "Inmueble",
+                    new { id = idInmueble }
+                );
+            
         }
 
         [HttpGet]
