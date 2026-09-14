@@ -1,0 +1,48 @@
+@model IEnumerable<Inmobiliaria.Models.Reserva>
+
+@{
+    ViewData["Title"] = "Reservas";
+    var inquilinos = ViewBag.Inquilinos as IList<Inmobiliaria.Models.Inquilino>
+        ?? new List<Inmobiliaria.Models.Inquilino>();
+    var inmuebles = ViewBag.Inmuebles as IList<Inmobiliaria.Models.Inmueble>
+        ?? new List<Inmobiliaria.Models.Inmueble>();
+}
+
+<h1>Reservas</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva reserva</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Inquilino</th>
+            <th>Inmueble</th>
+            <th>Fecha de inicio</th>
+            <th>Fecha de fin</th>
+            <th>Monto por día</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        var inquilino = inquilinos.FirstOrDefault(i => i.IdInquilino == item.IdInquilino);
+        var inmueble = inmuebles.FirstOrDefault(i => i.IdInmueble == item.IdInmueble);
+
+        <tr>
+            <td>@(inquilino == null ? "No encontrado" : $"{inquilino.Nombre} {inquilino.Apellido}")</td>
+            <td>@(inmueble == null ? "No encontrado" : inmueble.DireccionInmueble)</td>
+            <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
+            <td>@item.FechaFinOriginal.ToString("dd/MM/yyyy")</td>
+            <td>@item.MontoDia</td>
+            <td class="text-nowrap">
+                <a asp-action="Details" asp-route-id="@item.IdReserva">Detalle</a> |
+                <a asp-action="Edit" asp-route-id="@item.IdReserva">Editar</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdReserva">Eliminar</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

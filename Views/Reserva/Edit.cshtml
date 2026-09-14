@@ -1,0 +1,76 @@
+@model Inmobiliaria.Models.Reserva
+
+@{
+    ViewData["Title"] = "Editar reserva";
+    var inquilinos = ViewBag.Inquilinos as IList<Inmobiliaria.Models.Inquilino>
+        ?? new List<Inmobiliaria.Models.Inquilino>();
+    var inmuebles = ViewBag.Inmuebles as IList<Inmobiliaria.Models.Inmueble>
+        ?? new List<Inmobiliaria.Models.Inmueble>();
+}
+
+<h1>Editar reserva</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" asp-route-id="@Model.IdReserva" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IdReserva" />
+
+            <div class="mb-3">
+                <label class="form-label">Inquilino</label>
+                <select asp-for="IdInquilino" class="form-control">
+                    <option value="">Seleccione un inquilino</option>
+                    @foreach (var inquilino in inquilinos)
+                    {
+                        <option value="@inquilino.IdInquilino">
+                            @inquilino.Nombre @inquilino.Apellido - DNI @inquilino.Dni
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="IdInquilino" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Inmueble</label>
+                <select asp-for="IdInmueble" class="form-control">
+                    <option value="">Seleccione un inmueble</option>
+                    @foreach (var inmueble in inmuebles)
+                    {
+                        <option value="@inmueble.IdInmueble">
+                            @inmueble.DireccionInmueble
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="IdInmueble" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FechaInicio" class="form-label">Fecha de inicio</label>
+                <input asp-for="FechaInicio" type="date" class="form-control" />
+                <span asp-validation-for="FechaInicio" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FechaFinOriginal" class="form-label">Fecha de fin</label>
+                <input asp-for="FechaFinOriginal" type="date" class="form-control" />
+                <span asp-validation-for="FechaFinOriginal" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MontoDia" class="form-label">Monto por día</label>
+                <input asp-for="MontoDia" class="form-control" />
+                <span asp-validation-for="MontoDia" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Volver</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
