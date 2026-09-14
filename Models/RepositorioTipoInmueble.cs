@@ -12,14 +12,12 @@ namespace Inmobiliaria.Models
         public int Alta(TipoInmueble tipo)
         {
             int res = -1;
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"INSERT INTO TipoInmueble
                     (nombre_tipo)
                     VALUES
                     (@nombreTipo);
-
                     SELECT LAST_INSERT_ID();";
 
                 using (var command = new MySqlCommand(sql, connection))
@@ -29,18 +27,15 @@ namespace Inmobiliaria.Models
                     connection.Open();
 
                     res = Convert.ToInt32(command.ExecuteScalar());
-
                     tipo.IdTipoInmueble = res;
                 }
             }
-
             return res;
         }
 
         public int Baja(int id)
         {
             int res = -1;
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"DELETE FROM TipoInmueble
@@ -62,7 +57,6 @@ namespace Inmobiliaria.Models
         public int Modificacion(TipoInmueble tipo)
         {
             int res = -1;
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"UPDATE TipoInmueble
@@ -79,14 +73,12 @@ namespace Inmobiliaria.Models
                     res = command.ExecuteNonQuery();
                 }
             }
-
             return res;
         }
 
         public IList<TipoInmueble> ObtenerLista()
         {
             IList<TipoInmueble> lista = new List<TipoInmueble>();
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"SELECT
@@ -97,9 +89,7 @@ namespace Inmobiliaria.Models
                 using (var command = new MySqlCommand(sql, connection))
                 {
                     connection.Open();
-
                     var reader = command.ExecuteReader();
-
                     while (reader.Read())
                     {
                         TipoInmueble tipo = new TipoInmueble
@@ -107,19 +97,16 @@ namespace Inmobiliaria.Models
                             IdTipoInmueble = Convert.ToInt32(reader["id_tipo_inmueble"]),
                             NombreTipo = reader["nombre_tipo"].ToString() ?? ""
                         };
-
                         lista.Add(tipo);
                     }
                 }
             }
-
             return lista;
         }
 
         public TipoInmueble? ObtenerPorId(int id)
         {
             TipoInmueble? tipo = null;
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"SELECT
@@ -146,7 +133,6 @@ namespace Inmobiliaria.Models
                     }
                 }
             }
-
             return tipo;
         }
     }

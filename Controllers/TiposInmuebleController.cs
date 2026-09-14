@@ -6,13 +6,12 @@ namespace Inmobiliaria.Controllers
     public class TiposInmuebleController : Controller
     {
         private readonly IRepositorioTipoInmueble repositorio;
-
         public TiposInmuebleController(IRepositorioTipoInmueble repositorio)
         {
             this.repositorio = repositorio;
         }
 
-        // LISTAR
+
         public IActionResult Index()
         {
             var lista = repositorio.ObtenerLista();
@@ -34,11 +33,9 @@ namespace Inmobiliaria.Controllers
                 repositorio.Alta(tipo);
                 return RedirectToAction("Index");
             }
-
             return View(tipo);
         }
 
-        // MODIFICAR - mostrar formulario
         public IActionResult Edit(int id)
         {
             var tipo = repositorio.ObtenerPorId(id);
@@ -49,7 +46,7 @@ namespace Inmobiliaria.Controllers
             return View(tipo);
         }
 
-        // MODIFICAR - guardar
+
         [HttpPost]
         public IActionResult Edit(TipoInmueble tipo)
         {
@@ -58,22 +55,18 @@ namespace Inmobiliaria.Controllers
                 repositorio.Modificacion(tipo);
                 return RedirectToAction("Index");
             }
-
             return View(tipo);
         }
 
-        // ELIMINAR - mostrar confirmación
         public IActionResult Eliminar(int id)
         {
             var tipo = repositorio.ObtenerPorId(id);
-
             if (tipo == null)
                 return NotFound();
-
             return View(tipo);
         }
 
-        // ELIMINAR - confirmar
+
         [HttpPost]
         public IActionResult EliminarConfirmado(int id)
         {
