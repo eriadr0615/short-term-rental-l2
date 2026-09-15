@@ -1,4 +1,3 @@
-//imagen es creada sin imagen al comiezo
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,6 @@ namespace Inmobiliaria.Controllers
     {
         private readonly IRepositorioImagenInmueble repositorio;
         private readonly IWebHostEnvironment environment;
-
         private readonly string[] extensionesPermitidas =
         {
             ".jpg",
@@ -18,7 +16,6 @@ namespace Inmobiliaria.Controllers
             ".png",
             ".webp"
         };
-
         public ImagenInmuebleController(
             IRepositorioImagenInmueble repositorio,
             IWebHostEnvironment environment)
@@ -29,16 +26,11 @@ namespace Inmobiliaria.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Alta(int idInmueble, IFormFile imagen, bool esPrincipal = false)
+        public IActionResult Alta(int idInmueble, List<IFormFile> imagenes, bool esPrincipal = false)
         {
-            if (imagen == null || imagen.Length == 0)
+            if (imagenes == null || imagenes.Count == 0)
             {
-                return BadRequest("No se registro niguna actualizacion sobre una imagen");
-            }
-            string extension = Path.GetExtension(imagen.FileName).ToLower();
-            if (!extensionesPermitidas.Contains(extension))
-            {
-                return BadRequest("El formato de imagen no esta permitido. Reintente nuevamente");
+                return BadRequest("No se cargo ninguna imagen. Reintenta nuevamente");
             }
 
             string carpeta = Path.Combine(
@@ -51,42 +43,104 @@ namespace Inmobiliaria.Controllers
             {
                 Directory.CreateDirectory(carpeta);
             }
+            bool primeraImagen = true;
 
-            string nombreArchivo = Guid.NewGuid().ToString() + extension;
-            string rutaFisica = Path.Combine(carpeta, nombreArchivo);
-            using (var stream = new FileStream(rutaFisica, FileMode.Create))
+            foreach (var imagen in imagenes)
             {
-                imagen.CopyTo(stream);
+                if (imagen == null || imagen.Length == 0)
+                {
+                    continue;
+                }
+                string extension =
+                    Path.GetExtension(imagen.FileName).ToLower();
+
+                if (!extensionesPermitidas.Contains(extension))
+                {
+                    continue;
+                }
+                string nombreArchivo =
+                    Guid.NewGuid().ToString() + extension;
+                string rutaFisica =
+                    Path.Combine(carpeta, nombreArchivo);
+
+                using (var stream =
+                    new FileStream(rutaFisica, FileMode.Create))
+                {
+                    imagen.CopyTo(stream);
+                }
+
+                string url =
+                    $"/inmuebles/{idInmueble}/{nombreArchivo}";
+
+                bool principalEstaImagen =
+                    esPrincipal && primeraImagen;
+                if (principalEstaImagen)
+                {
+                    repositorio.QuitarPrincipal(idInmueble);
+                }
+                ImagenInmueble nuevaImagen =
+                    new ImagenInmueble
+                    {
+                        IdInmueble = idInmueble,
+                        UrlImg = url,
+                        EsPrincipal = principalEstaImagen
+                    };
+                repositorio.Alta(nuevaImagen);
+                primeraImagen = false;
             }
-            string url = $"/inmuebles/{idInmueble}/{nombreArchivo}";
-            ImagenInmueble nuevaImagen = new ImagenInmueble
-            {
-                IdInmueble = idInmueble,
-                UrlImg = url,
-                EsPrincipal = esPrincipal
-            };
 
-
-
-            if (esPrincipal)
-            {
-                repositorio.QuitarPrincipal(idInmueble);
-            }
-
-            repositorio.Alta(nuevaImagen);
             return RedirectToAction(
-                    "Details",
-                    "Inmueble",
-                    new { id = idInmueble }
-                );
-
+                "Details",
+                "Inmueble",
+                new { id = idInmueble }
+            );
         }
 
         [HttpGet]
         public IActionResult ObtenerPorInmueble(int idInmueble)
         {
-            var imagenes = repositorio.ObtenerPorInmueble(idInmueble);
+            var imagenes =
+                repositorio.ObtenerPorInmueble(idInmueble);
+
             return Ok(imagenes);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = Usuario.RolAdministrador)]
+        public IActionResult Eliminar(int id)
+        {
+            var imagen = repositorio.ObtenerPorId(id);
+
+            if (imagen == null)
+            {
+                return NotFound();
+            }
+
+            int idInmueble = imagen.IdInmueble;
+
+            string rutaRelativa =
+                imagen.UrlImg.TrimStart('/');
+
+            string rutaFisica = Path.Combine(
+                environment.WebRootPath,
+                rutaRelativa.Replace(
+                    "/",
+                    Path.DirectorySeparatorChar.ToString())
+            );
+
+            if (System.IO.File.Exists(rutaFisica))
+            {
+                System.IO.File.Delete(rutaFisica);
+            }
+
+            repositorio.Baja(id);
+
+            return RedirectToAction(
+                "Details",
+                "Inmueble",
+                new { id = idInmueble }
+            );
         }
     }
 }
