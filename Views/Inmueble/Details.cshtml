@@ -1,101 +1,275 @@
 @using Inmobiliaria.Models
 @model Inmueble
 
-<h1>Características del inmueble - Detalles</h1>
+<div class="container mt-4">
+    <h2 class="mb-4">Características del inmueble</h2>
+    @{
+        var imagenes = ViewBag.Imagenes as IList<ImagenInmueble>;
+    }
 
-<p>
-    <strong>Tipo de inmueble:</strong>
-    @ViewBag.TipoInmueble?.NombreTipo
-</p>
+    <div class="row g-4">
 
-<p><strong>Dirección:</strong> @Model.DireccionInmueble</p>
-<p><strong>Capacidad máxima:</strong> @Model.CapacidadMaxima</p>
-<p><strong>Precio por noche:</strong> @Model.PrecioDiario</p>
-<p><strong>Porcentaje de reserva:</strong> @Model.PorcentajeReserva</p>
-<p><strong>Coordenadas:</strong> @Model.CoordenadasInmuebles</p>
-<p><strong>Disponible:</strong> @Model.Disponible</p>
+        
+        <div class="col-lg-5">
 
-<hr />
-<h3>Imágenes del inmueble :</h3>
-<p>
-    <strong>Inmueble:</strong>
-    @Model.IdInmueble - @Model.DireccionInmueble
-</p>
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
 
-@{
-    var imagenes = ViewBag.Imagenes as IList<ImagenInmueble>;
-}
+                    <h4 class="card-title mb-3">
+                        Datos del inmueble
+                    </h4>
 
-@if (imagenes != null && imagenes.Count > 0)
-{
-    <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
+                    <p>
+                        <strong>Tipo:</strong>
+                        @ViewBag.TipoInmueble?.NombreTipo
+                    </p>
 
-        @foreach (var img in imagenes)
-        {
-            <div style="position:relative;">
+                    <p>
+                        <strong>Dirección:</strong>
+                        @Model.DireccionInmueble
+                    </p>
 
-                <img src="@img.UrlImg" alt="Imagen del inmueble" style="
-                width:220px;
-                height:150px;
-                object-fit:cover;
-                border-radius:6px;
-                border:1px solid #ccc;" />
+                    <p>
+                        <strong>Capacidad máxima:</strong>
+                        @Model.CapacidadMaxima
+                    </p>
 
-                @if (img.EsPrincipal)
-                {
-                    <span style="
-                        position:absolute;
-                        top:8px;
-                        left:8px;
-                        background:white;
-                        padding:3px 7px;
-                        border-radius:4px;
-                        font-size:12px;
-                        font-weight:bold;">
-                        Portada
-                    </span>
-                }
+                    <p>
+                        <strong>Precio por noche:</strong>
+                        $ @Model.PrecioDiario
+                    </p>
 
+                    <p>
+                        <strong>Porcentaje de reserva:</strong>
+                        @Model.PorcentajeReserva %
+                    </p>
+
+                    <p>
+                        <strong>Coordenadas:</strong>
+                        @Model.CoordenadasInmuebles
+                    </p>
+                    <p>
+                        <strong>Disponible:</strong>
+
+                        @if (Model.Disponible)
+                        {
+                            <span class="badge bg-success">Sí</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No</span>
+                        }
+                    </p>
+
+                </div>
             </div>
-        }
+        </div>
 
+
+     
+        <div class="col-lg-7">
+            <div>
+                <div>
+                    <h4 class="card-title mb-3">
+                        Imágenes del inmueble
+                    </h4>
+
+                    @if (imagenes != null && imagenes.Count > 0)
+                    {
+                        <div id="carouselInmueble" class="carousel slide" data-bs-ride="carousel">
+
+                            <div class="carousel-inner rounded">
+
+                                @{
+                                    bool primera = true;
+                                }
+
+                                @foreach (var img in imagenes)
+                                {
+                                    <div class="carousel-item @(primera ? "active" : "")">
+
+                                        <div class="position-relative bg-dark" style="height:420px;">
+
+                                            <img src="@img.UrlImg" class="d-block w-100 h-100" alt="Imagen del inmueble"
+                                                 style="object-fit:cover;" />
+
+                                            @if (img.EsPrincipal)
+                                            {
+                                                <span class="badge bg-primary position-absolute top-0 start-0 m-3">
+                                                    Portada
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                        <div class="mt-2">
+
+                                            <form asp-controller="ImagenInmueble" asp-action="Eliminar" method="post">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden" name="id" value="@img.IdImagen" />
+
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    Eliminar imagen
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                    primera = false;
+                                }
+
+                            </div>
+
+                            @if (imagenes.Count > 1)
+                            {
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselInmueble"
+                                        data-bs-slide="prev">
+
+                                    <span class="carousel-control-prev-icon"></span>
+                                    <span class="visually-hidden">Anterior</span>
+
+                                </button>
+
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselInmueble"
+                                        data-bs-slide="next">
+
+                                    <span class="carousel-control-next-icon"></span>
+                                    <span class="visually-hidden">Siguiente</span>
+
+                                </button>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-secondary">
+                            Este inmueble aun no posee imágenes cargadas.
+                        </div>
+                    }
+
+                    @if (imagenes != null && imagenes.Count > 0)
+                    {
+                        <div class="row g-3">
+                            @foreach (var img in imagenes)
+                            {
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="position-relative">
+                                            <button type="button" class="btn p-0 border-0 w-100" data-bs-toggle="modal"
+                                                    data-bs-target="#modalImagen_@img.IdImagen">
+                                                <img src="@img.UrlImg" alt="Imagen del inmueble" class="card-img-top" style="
+                                                height:190px;
+                                                object-fit:cover;
+                                                cursor:pointer;" />
+                                            </button>
+
+                                            @if (img.EsPrincipal)
+                                            {
+                                                <span class="badge bg-primary position-absolute top-0 start-0 m-2">
+                                                    Portada
+                                                </span>
+                                            }
+                                        </div>
+
+                                        <div class="card-body py-2">
+
+                                            <form asp-controller="ImagenInmueble" asp-action="Eliminar" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@img.IdImagen" />
+
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    Eliminar
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- MODAL -->
+                                    <div class="modal fade" id="modalImagen_@img.IdImagen" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-xl modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">
+                                                        Imagen del inmueble
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                    </button>
+                                                </div>
+
+                                                <div class="modal-body text-center">
+
+                                                    <img src="@img.UrlImg" class="img-fluid rounded" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-secondary">
+                            Este inmueble aun no posee imágenes cargadas
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
-}
-else
-{
-    <p>Este inmueble aún no posee imagenes cargadas.</p>
-}
 
-<hr />
 
-<h3>Agregar imagen</h3>
 
-<p>Formatos permitidos: .jpg, .jpeg, .png, .webp</p>
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h4 class="card-title">
+                Agregar imágenes
+            </h4>
+            <p class="text-muted">
+                Formatos permitidos: .jpg, .jpeg, .png, .webp
+            </p>
 
-<form asp-controller="ImagenInmueble" asp-action="Alta" method="post" enctype="multipart/form-data">
+            <form asp-controller="ImagenInmueble" asp-action="Alta" method="post" enctype="multipart/form-data">
 
-    <input type="hidden" name="idInmueble" value="@Model.IdInmueble" />
+                <input type="hidden" name="idInmueble" value="@Model.IdInmueble" />
 
-    <div style="margin-bottom:10px;">
-        <label>Seleccionar imagen</label>
+                <div class="mb-3">
 
-        <input type="file" name="imagen" accept=".jpg,.jpeg,.png,.webp" required />
+                    <label class="form-label">
+                        Seleccionar imágenes
+                    </label>
+
+                    <input type="file" name="imagenes" class="form-control" accept=".jpg,.jpeg,.png,.webp" multiple
+                           required />
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" name="esPrincipal" value="true" id="esPrincipal" />
+
+                    <label class="form-check-label" for="esPrincipal">
+                        Utilizar la primera imagen como portada
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    Agregar imágenes
+                </button>
+            </form>
+        </div>
     </div>
 
-    <div style="margin-bottom:10px;">
-        <label>
-            <input type="checkbox" name="esPrincipal" value="true" />
 
-            Usar como imagen de portada
-        </label>
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            Volver
+        </a>
     </div>
 
-    <button type="submit">
-        Enviar imagen
-    </button>
-
-</form>
-
-<br />
-
-<a asp-action="Index">Volver</a>
+</div>
