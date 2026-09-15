@@ -25,8 +25,6 @@ namespace Inmobiliaria.Models
         [Required]
         public string RolUsuario { get; set; } = RolEmpleado;
 
-        public DateTime? UltimaConexion { get; set; }
-
         public bool Activo { get; set; } = true;
     }
 }

@@ -37,6 +37,9 @@ Esquema de modelo de datos perteneciente a la app:
 - administración de usuarios reservada al Administrador
 - edición del perfil, contraseña y avatar propios
 - eliminaciones reservadas al Administrador
+- registro y consulta de pagos asociados a reservas
+- modificación exclusiva del concepto del pago
+- anulación lógica de pagos por un Administrador, conservando la auditoría
 
 #### Diagrama
 

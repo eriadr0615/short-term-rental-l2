@@ -84,7 +84,7 @@ namespace Inmobiliaria.Controllers
             }
 
             repositorio.Alta(reserva);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Create", "Pagos", new { idReserva = reserva.IdReserva });
         }
 
         public IActionResult Edit(int id)

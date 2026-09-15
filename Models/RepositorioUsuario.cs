@@ -14,9 +14,9 @@ namespace Inmobiliaria.Models
             using var connection = new MySqlConnection(connectionString);
             string sql = @"INSERT INTO Usuario
                            (avatar, nombre_usuario, correo_usuario, contrasenia_hash,
-                            rol_usuario, ultima_conexion, activo)
+                            rol_usuario, activo)
                            VALUES
-                           (@avatar, @nombre, @correo, @hash, @rol, @ultimaConexion, @activo);
+                           (@avatar, @nombre, @correo, @hash, @rol, @activo);
                            SELECT LAST_INSERT_ID();";
 
             using var command = new MySqlCommand(sql, connection);
@@ -25,7 +25,6 @@ namespace Inmobiliaria.Models
             command.Parameters.AddWithValue("@correo", usuario.CorreoUsuario);
             command.Parameters.AddWithValue("@hash", usuario.ContraseniaHash);
             command.Parameters.AddWithValue("@rol", usuario.RolUsuario);
-            command.Parameters.AddWithValue("@ultimaConexion", (object?)usuario.UltimaConexion ?? DBNull.Value);
             command.Parameters.AddWithValue("@activo", usuario.Activo);
 
             connection.Open();
@@ -64,7 +63,7 @@ namespace Inmobiliaria.Models
             var lista = new List<Usuario>();
             using var connection = new MySqlConnection(connectionString);
             string sql = @"SELECT id_usuario, avatar, nombre_usuario, correo_usuario,
-                                  contrasenia_hash, rol_usuario, ultima_conexion, activo
+                                  contrasenia_hash, rol_usuario, activo
                            FROM Usuario
                            ORDER BY nombre_usuario";
 
@@ -83,7 +82,7 @@ namespace Inmobiliaria.Models
         {
             using var connection = new MySqlConnection(connectionString);
             string sql = @"SELECT id_usuario, avatar, nombre_usuario, correo_usuario,
-                                  contrasenia_hash, rol_usuario, ultima_conexion, activo
+                                  contrasenia_hash, rol_usuario, activo
                            FROM Usuario
                            WHERE id_usuario = @id";
 
@@ -98,7 +97,7 @@ namespace Inmobiliaria.Models
         {
             using var connection = new MySqlConnection(connectionString);
             string sql = @"SELECT id_usuario, avatar, nombre_usuario, correo_usuario,
-                                  contrasenia_hash, rol_usuario, ultima_conexion, activo
+                                  contrasenia_hash, rol_usuario, activo
                            FROM Usuario
                            WHERE correo_usuario = @correo";
 
@@ -107,19 +106,6 @@ namespace Inmobiliaria.Models
             connection.Open();
             using var reader = command.ExecuteReader();
             return reader.Read() ? Mapear(reader) : null;
-        }
-
-        public int ActualizarUltimaConexion(int id, DateTime fecha)
-        {
-            using var connection = new MySqlConnection(connectionString);
-            string sql = @"UPDATE Usuario
-                           SET ultima_conexion = @fecha
-                           WHERE id_usuario = @id";
-            using var command = new MySqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@fecha", fecha);
-            command.Parameters.AddWithValue("@id", id);
-            connection.Open();
-            return command.ExecuteNonQuery();
         }
 
         public int ActualizarClave(int id, string contraseniaHash)
@@ -171,9 +157,6 @@ namespace Inmobiliaria.Models
                 CorreoUsuario = reader["correo_usuario"].ToString() ?? "",
                 ContraseniaHash = reader["contrasenia_hash"].ToString() ?? "",
                 RolUsuario = reader["rol_usuario"].ToString() ?? Usuario.RolEmpleado,
-                UltimaConexion = reader["ultima_conexion"] == DBNull.Value
-                    ? null
-                    : Convert.ToDateTime(reader["ultima_conexion"]),
                 Activo = Convert.ToBoolean(reader["activo"])
             };
         }

@@ -53,8 +53,6 @@ namespace Inmobiliaria.Controllers
                 return View(login);
             }
 
-            usuario.UltimaConexion = DateTime.Now;
-            repositorio.ActualizarUltimaConexion(usuario.IdUsuario, usuario.UltimaConexion.Value);
             await CrearCookie(usuario, login.Recordarme);
 
             if (!string.IsNullOrWhiteSpace(login.ReturnUrl) && Url.IsLocalUrl(login.ReturnUrl))

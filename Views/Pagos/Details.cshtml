@@ -1,0 +1,71 @@
+@model Pago
+
+@{
+    ViewData["Title"] = "Detalle del pago";
+    var reserva = ViewBag.Reserva as Reserva;
+    var usuarios = ViewBag.Usuarios as IList<Usuario> ?? new List<Usuario>();
+    var usuarioCreacion = usuarios.FirstOrDefault(u => u.IdUsuario == Model.IdUsuarioCreacion);
+    var usuarioAnulacion = Model.IdUsuarioAnulacion.HasValue
+        ? usuarios.FirstOrDefault(u => u.IdUsuario == Model.IdUsuarioAnulacion.Value)
+        : null;
+}
+
+<h1>Detalle del pago</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<dl class="row">
+    <dt class="col-sm-3">Número</dt>
+    <dd class="col-sm-9">@Model.IdPago</dd>
+
+    <dt class="col-sm-3">Reserva</dt>
+    <dd class="col-sm-9">
+        <a asp-controller="Reservas" asp-action="Details" asp-route-id="@Model.IdReserva">#@Model.IdReserva</a>
+    </dd>
+
+    <dt class="col-sm-3">Período de la reserva</dt>
+    <dd class="col-sm-9">
+        @(reserva == null ? "No encontrado" : $"{reserva.FechaInicio:dd/MM/yyyy} al {reserva.FechaFinOriginal:dd/MM/yyyy}")
+    </dd>
+
+    <dt class="col-sm-3">Concepto</dt>
+    <dd class="col-sm-9">@Model.Concepto</dd>
+
+    <dt class="col-sm-3">Fecha</dt>
+    <dd class="col-sm-9">@Model.FechaPago.ToString("dd/MM/yyyy HH:mm")</dd>
+
+    <dt class="col-sm-3">Monto</dt>
+    <dd class="col-sm-9">@Model.Monto.ToString("C")</dd>
+
+    <dt class="col-sm-3">Estado</dt>
+    <dd class="col-sm-9">@Model.Estado</dd>
+
+    @if (User.IsInRole(Usuario.RolAdministrador))
+    {
+        <dt class="col-sm-3">Registrado por</dt>
+        <dd class="col-sm-9">@(usuarioCreacion?.NombreUsuario ?? "No encontrado")</dd>
+
+        @if (Model.IdUsuarioAnulacion.HasValue)
+        {
+            <dt class="col-sm-3">Anulado por</dt>
+            <dd class="col-sm-9">@(usuarioAnulacion?.NombreUsuario ?? "No encontrado")</dd>
+        }
+    }
+</dl>
+
+@if (Model.Estado == Pago.EstadoActivo)
+{
+    <a asp-action="Edit" asp-route-id="@Model.IdPago" class="btn btn-primary">Editar concepto</a>
+}
+@if (Model.Estado == Pago.EstadoActivo && User.IsInRole(Usuario.RolAdministrador))
+{
+    <a asp-action="Anular" asp-route-id="@Model.IdPago" class="btn btn-danger">Anular pago</a>
+}
+<a asp-action="Index" asp-route-idReserva="@Model.IdReserva" class="btn btn-secondary">Volver</a>

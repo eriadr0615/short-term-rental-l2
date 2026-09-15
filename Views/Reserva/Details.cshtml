@@ -8,6 +8,15 @@
 
 <h1>Detalle de reserva</h1>
 
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
 <div>
     <hr />
     <dl class="row">
@@ -29,7 +38,10 @@
         <dd class="col-sm-10">@Model.MontoDia</dd>
     </dl>
 </div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.IdReserva" class="btn btn-primary">Editar</a>
+    <a asp-controller="Pagos" asp-action="Index" asp-route-idReserva="@Model.IdReserva"
+       class="btn btn-success">Ver pagos</a>
     <a asp-action="Index" class="btn btn-secondary">Volver</a>
 </div>

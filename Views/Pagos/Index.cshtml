@@ -1,0 +1,88 @@
+@model IEnumerable<Pago>
+
+@{
+    ViewData["Title"] = "Pagos";
+    var reservas = ViewBag.Reservas as IList<Reserva> ?? new List<Reserva>();
+    var inquilinos = ViewBag.Inquilinos as IList<Inquilino> ?? new List<Inquilino>();
+    var inmuebles = ViewBag.Inmuebles as IList<Inmueble> ?? new List<Inmueble>();
+    var reservaSeleccionada = ViewBag.ReservaSeleccionada as Reserva;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>@(reservaSeleccionada == null ? "Pagos" : $"Pagos de la reserva #{reservaSeleccionada.IdReserva}")</h1>
+    <a asp-action="Create" asp-route-idReserva="@reservaSeleccionada?.IdReserva"
+       class="btn btn-primary">Registrar pago</a>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Reserva</th>
+            <th>Inquilino</th>
+            <th>Inmueble</th>
+            <th>Concepto</th>
+            <th>Monto</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pago in Model)
+        {
+            var reserva = reservas.FirstOrDefault(r => r.IdReserva == pago.IdReserva);
+            var inquilino = reserva == null
+                ? null
+                : inquilinos.FirstOrDefault(i => i.IdInquilino == reserva.IdInquilino);
+            var inmueble = reserva == null
+                ? null
+                : inmuebles.FirstOrDefault(i => i.IdInmueble == reserva.IdInmueble);
+            <tr>
+                <td>@pago.FechaPago.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>#@pago.IdReserva</td>
+                <td>@(inquilino == null ? "No encontrado" : $"{inquilino.Nombre} {inquilino.Apellido}")</td>
+                <td>@(inmueble?.DireccionInmueble ?? "No encontrado")</td>
+                <td>@pago.Concepto</td>
+                <td>@pago.Monto.ToString("C")</td>
+                <td>
+                    @if (pago.Estado == Pago.EstadoActivo)
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Anulado</span>
+                    }
+                </td>
+                <td class="text-nowrap">
+                    <a asp-action="Details" asp-route-id="@pago.IdPago">Detalle</a>
+                    @if (pago.Estado == Pago.EstadoActivo)
+                    {
+                        <span> | </span>
+                        <a asp-action="Edit" asp-route-id="@pago.IdPago">Editar concepto</a>
+                        @if (User.IsInRole(Usuario.RolAdministrador))
+                        {
+                            <span> | </span>
+                            <a asp-action="Anular" asp-route-id="@pago.IdPago" class="text-danger">Anular</a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (reservaSeleccionada != null)
+{
+    <a asp-controller="Reservas" asp-action="Details" asp-route-id="@reservaSeleccionada.IdReserva"
+       class="btn btn-secondary">Volver a la reserva</a>
+}

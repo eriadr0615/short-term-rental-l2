@@ -1,0 +1,33 @@
+@model PagoEditarView
+
+@{
+    ViewData["Title"] = "Editar pago";
+}
+
+<h1>Editar concepto del pago</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" asp-route-id="@Model.IdPago" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input asp-for="IdPago" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="Concepto" class="form-label"></label>
+                <input asp-for="Concepto" class="form-control" />
+                <span asp-validation-for="Concepto" class="text-danger"></span>
+            </div>
+
+            <div class="alert alert-info">
+                El importe y la fecha no pueden modificarse.
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-action="Details" asp-route-id="@Model.IdPago" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

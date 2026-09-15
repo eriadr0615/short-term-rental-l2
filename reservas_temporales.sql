@@ -41,7 +41,6 @@ CREATE TABLE Usuario (
     correo_usuario VARCHAR(100) NOT NULL UNIQUE,
     contrasenia_hash VARCHAR(255) NOT NULL,
     rol_usuario VARCHAR(20) NOT NULL,
-    ultima_conexion DATETIME NULL,
     activo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
@@ -164,10 +163,10 @@ INSERT INTO TipoInmueble (nombre_tipo) VALUES
 ('Loft');
 
 INSERT INTO Usuario
-(avatar, nombre_usuario, correo_usuario, contrasenia_hash, rol_usuario, ultima_conexion, activo)
+(avatar, nombre_usuario, correo_usuario, contrasenia_hash, rol_usuario, activo)
 VALUES
-(NULL, 'Administrador del sistema', 'admin@inmobiliaria.com', 'PBKDF2$100000$YWRtaW4taW5tb2ItMjAyNg==$T/ARyUqoX9FZHtX4TLIpCYItqsWKgKu7JwCZyepjqcI=', 'Administrador', NULL, TRUE),
-(NULL, 'Empleado de prueba', 'empleado@inmobiliaria.com', 'PBKDF2$100000$ZW1wbGVhZG8taW5tMjAyNg==$jyXyKQe0FLIMrv4XdPuMX6srWABaGo1jMkoEsmW4g/k=', 'Empleado', NULL, TRUE);
+(NULL, 'Administrador del sistema', 'admin@inmobiliaria.com', 'PBKDF2$100000$YWRtaW4taW5tb2ItMjAyNg==$T/ARyUqoX9FZHtX4TLIpCYItqsWKgKu7JwCZyepjqcI=', 'Administrador', TRUE),
+(NULL, 'Empleado de prueba', 'empleado@inmobiliaria.com', 'PBKDF2$100000$ZW1wbGVhZG8taW5tMjAyNg==$jyXyKQe0FLIMrv4XdPuMX6srWABaGo1jMkoEsmW4g/k=', 'Empleado', TRUE);
 
 
 INSERT INTO Propietario
@@ -187,20 +186,3 @@ VALUES
 SELECT * FROM Propietario;
 SELECT * FROM Inquilino;
 SELECT * FROM TipoInmueble;
-
-
-USE reservas_temporales;
-
-ALTER TABLE Usuario
-ADD COLUMN activo BOOLEAN NOT NULL DEFAULT TRUE;
-
-INSERT INTO Usuario
-(avatar, nombre_usuario, correo_usuario, contrasenia_hash, rol_usuario, ultima_conexion, activo)
-VALUES
-(NULL,
- 'Administrador del sistema',
- 'admin@mail.com',
- 'PBKDF2$100000$YWRtaW4taW5tb2ItMjAyNg==$T/ARyUqoX9FZHtX4TLIpCYItqsWKgKu7JwCZyepjqcI=',
- 'Administrador',
- NULL,
- TRUE);

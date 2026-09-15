@@ -12,6 +12,7 @@ builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
 builder.Services.AddScoped<IRepositorioImagenInmueble, RepositorioImagenInmueble>();
 builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
+builder.Services.AddScoped<IRepositorioPago, RepositorioPago>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

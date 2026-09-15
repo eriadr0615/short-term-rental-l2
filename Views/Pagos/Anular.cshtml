@@ -1,0 +1,20 @@
+@model Pago
+
+@{
+    ViewData["Title"] = "Anular pago";
+}
+
+<h1>Anular pago</h1>
+
+<div class="alert alert-warning">
+    ¿Confirma que desea anular el pago <strong>#@Model.IdPago</strong>
+    por <strong>@Model.Monto.ToString("C")</strong>?
+</div>
+
+<p>El pago permanecerá registrado y se guardará qué administrador realizó la anulación.</p>
+
+<form asp-action="AnularConfirmado" method="post">
+    <input type="hidden" name="id" value="@Model.IdPago" />
+    <button type="submit" class="btn btn-danger">Confirmar anulación</button>
+    <a asp-action="Details" asp-route-id="@Model.IdPago" class="btn btn-secondary">Cancelar</a>
+</form>

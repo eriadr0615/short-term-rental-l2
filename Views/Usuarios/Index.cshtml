@@ -25,7 +25,6 @@
             <th>Correo</th>
             <th>Rol</th>
             <th>Estado</th>
-            <th>Última conexión</th>
             <th></th>
         </tr>
     </thead>
@@ -46,7 +45,6 @@
                         <span class="badge bg-secondary">Inactivo</span>
                     }
                 </td>
-                <td>@(usuario.UltimaConexion?.ToString("dd/MM/yyyy HH:mm") ?? "Nunca")</td>
                 <td class="text-nowrap">
                     <a asp-action="Edit" asp-route-id="@usuario.IdUsuario">Editar</a>
                     @if (usuario.Activo)
