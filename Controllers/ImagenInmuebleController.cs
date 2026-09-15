@@ -35,7 +35,7 @@ namespace Inmobiliaria.Controllers
             string extension = Path.GetExtension(imagen.FileName).ToLower();
             if (!extensionesPermitidas.Contains(extension))
             {
-                return BadRequest("El formato de imagen no está permitido.");
+                return BadRequest("El formato de imagen no esta permitido. Reintente nuevamente");
             }
 
             string carpeta = Path.Combine(
@@ -63,13 +63,20 @@ namespace Inmobiliaria.Controllers
                 EsPrincipal = esPrincipal
             };
 
+
+
+            if (esPrincipal)
+            {
+                repositorio.QuitarPrincipal(idInmueble);
+            }
+
             repositorio.Alta(nuevaImagen);
             return RedirectToAction(
                     "Details",
                     "Inmueble",
                     new { id = idInmueble }
                 );
-            
+
         }
 
         [HttpGet]

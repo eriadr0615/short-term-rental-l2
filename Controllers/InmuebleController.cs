@@ -105,7 +105,6 @@ namespace Inmobiliaria.Controllers
 
             return RedirectToAction("Index");
         }
-
         public IActionResult Details(int id)
         {
             var inmueble = repositorio.ObtenerPorId(id);
@@ -117,7 +116,11 @@ namespace Inmobiliaria.Controllers
 
             ViewBag.Imagenes = repositorioImagen.ObtenerPorInmueble(id);
 
+            ViewBag.TipoInmueble =
+                repositorioTipoInmueble.ObtenerPorId(inmueble.IdTipoInmueble);
             return View(inmueble);
         }
+
+
     }
 }

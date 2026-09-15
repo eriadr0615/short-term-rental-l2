@@ -12,7 +12,6 @@ namespace Inmobiliaria.Models
         public int Alta(Inmueble inmueble)
         {
             int res = -1;
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"INSERT INTO Inmueble
@@ -50,7 +49,6 @@ namespace Inmobiliaria.Models
                     connection.Open();
 
                     res = Convert.ToInt32(command.ExecuteScalar());
-
                     inmueble.IdInmueble = res;
                 }
             }
@@ -61,12 +59,10 @@ namespace Inmobiliaria.Models
         public int Baja(int id)
         {
             int res = -1;
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"DELETE FROM Inmueble
                                WHERE id_inmueble = @id";
-
                 using (var command = new MySqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@id", id);
@@ -76,14 +72,12 @@ namespace Inmobiliaria.Models
                     res = command.ExecuteNonQuery();
                 }
             }
-
             return res;
         }
 
         public int Modificacion(Inmueble inmueble)
         {
             int res = -1;
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"UPDATE Inmueble
@@ -114,14 +108,12 @@ namespace Inmobiliaria.Models
                     res = command.ExecuteNonQuery();
                 }
             }
-
             return res;
         }
 
         public IList<Inmueble> ObtenerLista()
         {
             IList<Inmueble> lista = new List<Inmueble>();
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"SELECT
@@ -139,9 +131,7 @@ namespace Inmobiliaria.Models
                 using (var command = new MySqlCommand(sql, connection))
                 {
                     connection.Open();
-
                     var reader = command.ExecuteReader();
-
                     while (reader.Read())
                     {
                         Inmueble inmueble = new Inmueble
@@ -156,12 +146,10 @@ namespace Inmobiliaria.Models
                             Disponible = Convert.ToBoolean(reader["disponible"]),
                             CapacidadMaxima = Convert.ToInt32(reader["capacidad_maxima"])
                         };
-
                         lista.Add(inmueble);
                     }
                 }
             }
-
             return lista;
         }
 

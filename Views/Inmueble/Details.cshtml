@@ -1,19 +1,22 @@
 @using Inmobiliaria.Models
 @model Inmueble
 
-<h1>Caracteristicas del inmueble - Detalles:</h1>
+<h1>Características del inmueble - Detalles</h1>
 
-<p><strong>Direccion:</strong> @Model.DireccionInmueble</p>
-<p><strong>Capacidad maxima:</strong> @Model.CapacidadMaxima</p>
+<p>
+    <strong>Tipo de inmueble:</strong>
+    @ViewBag.TipoInmueble?.NombreTipo
+</p>
+
+<p><strong>Dirección:</strong> @Model.DireccionInmueble</p>
+<p><strong>Capacidad máxima:</strong> @Model.CapacidadMaxima</p>
 <p><strong>Precio por noche:</strong> @Model.PrecioDiario</p>
 <p><strong>Porcentaje de reserva:</strong> @Model.PorcentajeReserva</p>
 <p><strong>Coordenadas:</strong> @Model.CoordenadasInmuebles</p>
 <p><strong>Disponible:</strong> @Model.Disponible</p>
 
 <hr />
-
-<h3>Imagenes del inmueble</h3>
-
+<h3>Imágenes del inmueble :</h3>
 <p>
     <strong>Inmueble:</strong>
     @Model.IdInmueble - @Model.DireccionInmueble
@@ -25,46 +28,74 @@
 
 @if (imagenes != null && imagenes.Count > 0)
 {
-    @foreach (var img in imagenes)
-    {
-        <div style="margin-bottom:15px;">
-            <img src="@img.UrlImg" alt="Imagen del inmueble" style="width:220px; height:150px; object-fit:cover;" />
-            @if (img.EsPrincipal)
-            {
-                <p><strong>Imagen de portada</strong></p>
-            }
-        </div>
-    }
+    <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
+
+        @foreach (var img in imagenes)
+        {
+            <div style="position:relative;">
+
+                <img src="@img.UrlImg" alt="Imagen del inmueble" style="
+                width:220px;
+                height:150px;
+                object-fit:cover;
+                border-radius:6px;
+                border:1px solid #ccc;" />
+
+                @if (img.EsPrincipal)
+                {
+                    <span style="
+                        position:absolute;
+                        top:8px;
+                        left:8px;
+                        background:white;
+                        padding:3px 7px;
+                        border-radius:4px;
+                        font-size:12px;
+                        font-weight:bold;">
+                        Portada
+                    </span>
+                }
+
+            </div>
+        }
+
+    </div>
 }
 else
 {
-    <p>Este inmueble aún no posee imagenes para mostrar</p>
+    <p>Este inmueble aún no posee imagenes cargadas.</p>
 }
 
 <hr />
 
 <h3>Agregar imagen</h3>
-<h4>Formatos esperados: .jpg,.jpeg,.png,.webp</h4>
+
+<p>Formatos permitidos: .jpg, .jpeg, .png, .webp</p>
+
 <form asp-controller="ImagenInmueble" asp-action="Alta" method="post" enctype="multipart/form-data">
 
     <input type="hidden" name="idInmueble" value="@Model.IdInmueble" />
-    <div>
+
+    <div style="margin-bottom:10px;">
         <label>Seleccionar imagen</label>
+
         <input type="file" name="imagen" accept=".jpg,.jpeg,.png,.webp" required />
     </div>
 
-    <div>
+    <div style="margin-bottom:10px;">
         <label>
             <input type="checkbox" name="esPrincipal" value="true" />
+
             Usar como imagen de portada
         </label>
     </div>
 
-    <br />
-
     <button type="submit">
         Enviar imagen
     </button>
+
 </form>
+
 <br />
+
 <a asp-action="Index">Volver</a>
