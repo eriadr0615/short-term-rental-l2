@@ -1,8 +1,16 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Bienvenido</h1>
-    <p>Inmobiliaria Soñada</a>.</p>
+    <h1 class="display-4">Inmobiliaria Soñada</h1>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <p>Bienvenido, @(User.FindFirst("FullName")?.Value ?? User.Identity.Name).</p>
+    }
+    else
+    {
+        <p>Ingrese al sistema para administrar las reservas temporales.</p>
+        <a asp-controller="Usuarios" asp-action="Login" class="btn btn-primary">Iniciar sesión</a>
+    }
 </div>

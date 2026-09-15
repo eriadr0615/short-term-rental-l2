@@ -1,9 +1,11 @@
 //imagen es creada sin imagen al comiezo
 using Inmobiliaria.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers
 {
+    [Authorize]
     public class ImagenInmuebleController : Controller
     {
         private readonly IRepositorioImagenInmueble repositorio;
@@ -26,6 +28,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Alta(int idInmueble, IFormFile imagen, bool esPrincipal = false)
         {
             if (imagen == null || imagen.Length == 0)

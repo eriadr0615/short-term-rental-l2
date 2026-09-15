@@ -1,0 +1,43 @@
+@model Usuario
+
+@{
+    ViewData["Title"] = "Mi perfil";
+}
+
+<h1>Mi perfil</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+<div class="card" style="max-width: 650px;">
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            @if (!string.IsNullOrWhiteSpace(Model.Avatar))
+            {
+                <img src="@Model.Avatar" alt="Avatar" class="rounded-circle" style="width:90px;height:90px;object-fit:cover;" />
+            }
+            else
+            {
+                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
+                     style="width:90px;height:90px;font-size:2rem;">
+                    @Model.NombreUsuario.Substring(0, 1).ToUpper()
+                </div>
+            }
+            <div>
+                <h2 class="h4 mb-1">@Model.NombreUsuario</h2>
+                <div>@Model.CorreoUsuario</div>
+                <span class="badge bg-primary">@Model.RolUsuario</span>
+            </div>
+        </div>
+
+        <p><strong>Última conexión:</strong> @(Model.UltimaConexion?.ToString("dd/MM/yyyy HH:mm") ?? "Sin registro")</p>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-action="EditarPerfil" class="btn btn-primary">Editar datos</a>
+            <a asp-action="CambiarClave" class="btn btn-outline-primary">Cambiar contraseña</a>
+            <a asp-action="CambiarAvatar" class="btn btn-outline-primary">Cambiar avatar</a>
+        </div>
+    </div>
+</div>

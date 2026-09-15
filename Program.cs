@@ -1,4 +1,5 @@
 using Inmobiliaria.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 //inyeccion de dependiencias
@@ -10,10 +11,23 @@ builder.Services.AddScoped<IRepositorioInmueble, RepositorioInmueble>();
 builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
 builder.Services.AddScoped<IRepositorioImagenInmueble, RepositorioImagenInmueble>();
-
-
+builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Usuarios/Login";
+        options.LogoutPath = "/Usuarios/Logout";
+        options.AccessDeniedPath = "/Usuarios/Restringido";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(Usuario.RolAdministrador,
+        policy => policy.RequireRole(Usuario.RolAdministrador));
+});
 
 var app = builder.Build();
 
@@ -28,6 +42,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

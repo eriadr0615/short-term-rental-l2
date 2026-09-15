@@ -1,0 +1,61 @@
+@model IEnumerable<Usuario>
+
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Usuarios</h1>
+    <a asp-action="Create" class="btn btn-primary">Nuevo usuario</a>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Última conexión</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var usuario in Model)
+        {
+            <tr>
+                <td>@usuario.NombreUsuario</td>
+                <td>@usuario.CorreoUsuario</td>
+                <td>@usuario.RolUsuario</td>
+                <td>
+                    @if (usuario.Activo)
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactivo</span>
+                    }
+                </td>
+                <td>@(usuario.UltimaConexion?.ToString("dd/MM/yyyy HH:mm") ?? "Nunca")</td>
+                <td class="text-nowrap">
+                    <a asp-action="Edit" asp-route-id="@usuario.IdUsuario">Editar</a>
+                    @if (usuario.Activo)
+                    {
+                        <span> | </span>
+                        <a asp-action="Eliminar" asp-route-id="@usuario.IdUsuario" class="text-danger">Desactivar</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

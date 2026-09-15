@@ -39,8 +39,12 @@
             <td>@item.MontoDia</td>
             <td class="text-nowrap">
                 <a asp-action="Details" asp-route-id="@item.IdReserva">Detalle</a> |
-                <a asp-action="Edit" asp-route-id="@item.IdReserva">Editar</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdReserva">Eliminar</a>
+                <a asp-action="Edit" asp-route-id="@item.IdReserva">Editar</a>
+                @if (User.IsInRole(Usuario.RolAdministrador))
+                {
+                    <span> | </span>
+                    <a asp-action="Delete" asp-route-id="@item.IdReserva">Eliminar</a>
+                }
             </td>
         </tr>
 }

@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="utf-8" />
@@ -26,30 +26,51 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Inquilinos"
-                               asp-action="Index">Inquilinos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Propietarios" asp-action="Index">
-                                Propietarios
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Inmueble" asp-action="Index">
-                                Inmuebles
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="TiposInmueble" asp-action="Index">
-                                Tipo de inmuebles
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Reservas" asp-action="Index">
-                                Reservas
-                            </a>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Inquilinos" asp-action="Index">Inquilinos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Propietarios" asp-action="Index">Propietarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Inmueble" asp-action="Index">Inmuebles</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="TiposInmueble" asp-action="Index">Tipos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Reservas" asp-action="Index">Reservas</a>
+                            </li>
+                            @if (User.IsInRole(Usuario.RolAdministrador))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Usuarios" asp-action="Perfil">
+                                    @(User.FindFirst("FullName")?.Value ?? User.Identity.Name)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Usuarios" asp-action="Logout" method="post">
+                                    <button type="submit" class="nav-link btn btn-link text-dark">Salir</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Usuarios" asp-action="Login">Ingresar</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

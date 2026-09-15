@@ -24,6 +24,20 @@ Esquema de modelo de datos perteneciente a la app:
 - alta, baja, modificación de entidad Propietario
 - alta, baja, modificacion de entidad Inquilinos
 
+#### Segunda entrega
+
+- alta, baja, modificación y detalle de inmuebles
+- administración de tipos de inmueble
+- alta, baja, modificación y detalle de reservas
+
+#### Entrega final
+
+- inicio y cierre de sesión mediante cookies
+- autorización por roles Administrador y Empleado
+- administración de usuarios reservada al Administrador
+- edición del perfil, contraseña y avatar propios
+- eliminaciones reservadas al Administrador
+
 #### Diagrama
 
 Diagrama de entidad relacion
@@ -119,3 +133,14 @@ http://localhost:5277
 ```
 
 Listo! Con esa url ya podes ingresar a la aplicación desde el navegador.
+
+## Usuarios de prueba
+
+El script crea estos usuarios para comprobar los permisos:
+
+| Rol | Correo | Contraseña |
+| --- | --- | --- |
+| Administrador | `admin@inmobiliaria.com` | `Admin123!` |
+| Empleado | `empleado@inmobiliaria.com` | `Empleado123!` |
+
+Las contraseñas se guardan como hashes PBKDF2 con salt, no como texto plano.

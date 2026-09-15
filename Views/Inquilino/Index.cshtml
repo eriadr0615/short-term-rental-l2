@@ -34,8 +34,12 @@
                 <td>@Html.DisplayFor(modelItem => item.Direccion)</td>
                 <td class="text-nowrap">
                     <a asp-action="Details" asp-route-id="@item.IdInquilino" class="btn btn-secondary">Detalle</a> |
-                    <a asp-action="Edit" asp-route-id="@item.IdInquilino" class="btn btn-warning">Editar</a> |
-                    <a asp-action="Delete" asp-route-id="@item.IdInquilino" class="btn btn-danger">Eliminar</a>
+                    <a asp-action="Edit" asp-route-id="@item.IdInquilino" class="btn btn-warning">Editar</a>
+                    @if (User.IsInRole(Usuario.RolAdministrador))
+                    {
+                        <span> | </span>
+                        <a asp-action="Delete" asp-route-id="@item.IdInquilino" class="btn btn-danger">Eliminar</a>
+                    }
                 </td>
             </tr>
 

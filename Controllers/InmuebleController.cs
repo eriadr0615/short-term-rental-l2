@@ -1,8 +1,10 @@
 using Inmobiliaria.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers
 {
+    [Authorize]
     public class InmuebleController : Controller
     {
         private readonly IRepositorioInmueble repositorio;
@@ -40,6 +42,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Inmueble inmueble)
         {
             if (ModelState.IsValid)
@@ -71,6 +74,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(Inmueble inmueble)
         {
             if (ModelState.IsValid)
@@ -86,6 +90,7 @@ namespace Inmobiliaria.Controllers
             return View(inmueble);
         }
 
+        [Authorize(Policy = Usuario.RolAdministrador)]
         public IActionResult Eliminar(int id)
         {
             var inmueble = repositorio.ObtenerPorId(id);
@@ -99,6 +104,8 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = Usuario.RolAdministrador)]
         public IActionResult EliminarConfirmado(int id)
         {
             repositorio.Baja(id);

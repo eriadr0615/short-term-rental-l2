@@ -1,8 +1,10 @@
 using Inmobiliaria.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers
 {
+    [Authorize]
     public class PropietariosController : Controller
     {
         private readonly IRepositorioPropietario repositorio;
@@ -27,6 +29,7 @@ namespace Inmobiliaria.Controllers
 
         // ALlta - save
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Propietario propietario)
         {
             if (ModelState.IsValid)
@@ -51,6 +54,7 @@ namespace Inmobiliaria.Controllers
 
         // Mod - save
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(Propietario propietario)
         {
             if (ModelState.IsValid)
@@ -63,6 +67,7 @@ namespace Inmobiliaria.Controllers
         }
 
         // deletes . muetsra la confirmacion  
+        [Authorize(Policy = Usuario.RolAdministrador)]
         public IActionResult Eliminar(int id)
         {
             var propietario = repositorio.ObtenerPorId(id);
@@ -75,6 +80,8 @@ namespace Inmobiliaria.Controllers
 
         // delete . confirmacion 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = Usuario.RolAdministrador)]
         public IActionResult EliminarConfirmado(int id)
         {
             repositorio.Baja(id);

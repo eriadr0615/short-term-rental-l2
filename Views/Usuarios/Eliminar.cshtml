@@ -1,0 +1,19 @@
+@model Usuario
+
+@{
+    ViewData["Title"] = "Desactivar usuario";
+}
+
+<h1>Desactivar usuario</h1>
+
+<div class="alert alert-warning">
+    ¿Confirma que desea desactivar a <strong>@Model.NombreUsuario</strong>?
+</div>
+
+<p>El usuario no podrá volver a iniciar sesión, pero sus datos de auditoría se conservarán.</p>
+
+<form asp-action="EliminarConfirmado" method="post">
+    <input type="hidden" name="id" value="@Model.IdUsuario" />
+    <button type="submit" class="btn btn-danger">Desactivar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

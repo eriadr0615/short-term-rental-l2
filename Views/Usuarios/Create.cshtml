@@ -1,0 +1,55 @@
+@model UsuarioCrearView
+
+@{
+    ViewData["Title"] = "Nuevo usuario";
+}
+
+<h1>Nuevo usuario</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="NombreUsuario" class="form-label">Nombre completo</label>
+                <input asp-for="NombreUsuario" class="form-control" />
+                <span asp-validation-for="NombreUsuario" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CorreoUsuario" class="form-label">Correo</label>
+                <input asp-for="CorreoUsuario" class="form-control" />
+                <span asp-validation-for="CorreoUsuario" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Clave" class="form-label">Contraseña</label>
+                <input asp-for="Clave" class="form-control" />
+                <span asp-validation-for="Clave" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmarClave" class="form-label">Repetir contraseña</label>
+                <input asp-for="ConfirmarClave" class="form-control" />
+                <span asp-validation-for="ConfirmarClave" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="RolUsuario" class="form-label">Rol</label>
+                <select asp-for="RolUsuario" class="form-select">
+                    <option value="Empleado">Empleado</option>
+                    <option value="Administrador">Administrador</option>
+                </select>
+                <span asp-validation-for="RolUsuario" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-action="Index" class="btn btn-secondary">Volver</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

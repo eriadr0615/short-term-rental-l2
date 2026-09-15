@@ -1,0 +1,43 @@
+@model AvatarView
+
+@{
+    ViewData["Title"] = "Cambiar avatar";
+}
+
+<h1>Cambiar avatar</h1>
+
+@if (!string.IsNullOrWhiteSpace(Model.AvatarActual))
+{
+    <div class="mb-3">
+        <img src="@Model.AvatarActual" alt="Avatar actual" class="rounded-circle"
+             style="width:120px;height:120px;object-fit:cover;" />
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CambiarAvatar" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Archivo" class="form-label">Nueva imagen</label>
+                <input asp-for="Archivo" type="file" accept=".jpg,.jpeg,.png,.webp" class="form-control" />
+                <span asp-validation-for="Archivo" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar avatar</button>
+            <a asp-action="Perfil" class="btn btn-secondary">Cancelar</a>
+        </form>
+
+        @if (!string.IsNullOrWhiteSpace(Model.AvatarActual))
+        {
+            <form asp-action="EliminarAvatar" method="post" class="mt-3">
+                <button type="submit" class="btn btn-outline-danger">Quitar avatar</button>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
