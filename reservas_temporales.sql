@@ -187,3 +187,20 @@ VALUES
 SELECT * FROM Propietario;
 SELECT * FROM Inquilino;
 SELECT * FROM TipoInmueble;
+
+
+USE reservas_temporales;
+
+ALTER TABLE Usuario
+ADD COLUMN activo BOOLEAN NOT NULL DEFAULT TRUE;
+
+INSERT INTO Usuario
+(avatar, nombre_usuario, correo_usuario, contrasenia_hash, rol_usuario, ultima_conexion, activo)
+VALUES
+(NULL,
+ 'Administrador del sistema',
+ 'admin@mail.com',
+ 'PBKDF2$100000$YWRtaW4taW5tb2ItMjAyNg==$T/ARyUqoX9FZHtX4TLIpCYItqsWKgKu7JwCZyepjqcI=',
+ 'Administrador',
+ NULL,
+ TRUE);
