@@ -2,10 +2,8 @@
 
 @{
     ViewData["Title"] = "Editar reserva";
-    var inquilinos = ViewBag.Inquilinos as IList<Inmobiliaria.Models.Inquilino>
-        ?? new List<Inmobiliaria.Models.Inquilino>();
-    var inmuebles = ViewBag.Inmuebles as IList<Inmobiliaria.Models.Inmueble>
-        ?? new List<Inmobiliaria.Models.Inmueble>();
+    var inquilinoActual = ViewBag.InquilinoActual as Inmobiliaria.Models.Inquilino;
+    var inmuebleActual = ViewBag.InmuebleActual as Inmobiliaria.Models.Inmueble;
 }
 
 <h1>Editar reserva</h1>
@@ -19,12 +17,14 @@
 
             <div class="mb-3">
                 <label class="form-label">Inquilino</label>
-                <select asp-for="IdInquilino" class="form-control">
+                <input id="buscar-inquilino" class="form-control mb-1"
+                       placeholder="Buscar por nombre, apellido o DNI" autocomplete="off" />
+                <select asp-for="IdInquilino" id="inquilino" class="form-select">
                     <option value="">Seleccione un inquilino</option>
-                    @foreach (var inquilino in inquilinos)
+                    @if (inquilinoActual != null)
                     {
-                        <option value="@inquilino.IdInquilino">
-                            @inquilino.Nombre @inquilino.Apellido - DNI @inquilino.Dni
+                        <option value="@inquilinoActual.IdInquilino" selected>
+                            @inquilinoActual.Nombre @inquilinoActual.Apellido - DNI @inquilinoActual.Dni
                         </option>
                     }
                 </select>
@@ -33,12 +33,14 @@
 
             <div class="mb-3">
                 <label class="form-label">Inmueble</label>
-                <select asp-for="IdInmueble" class="form-control">
+                <input id="buscar-inmueble" class="form-control mb-1"
+                       placeholder="Buscar por dirección" autocomplete="off" />
+                <select asp-for="IdInmueble" id="inmueble" class="form-select">
                     <option value="">Seleccione un inmueble</option>
-                    @foreach (var inmueble in inmuebles)
+                    @if (inmuebleActual != null)
                     {
-                        <option value="@inmueble.IdInmueble">
-                            @inmueble.DireccionInmueble
+                        <option value="@inmuebleActual.IdInmueble" selected>
+                            @inmuebleActual.DireccionInmueble
                         </option>
                     }
                 </select>
@@ -72,5 +74,24 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_BusquedaAjaxScripts" />
+    <script>
+        configurarBusquedaAjax(
+            "#buscar-inquilino",
+            "#inquilino",
+            "@Url.Action("Buscar", "Inquilinos")");
+
+        configurarBusquedaAjax(
+            "#buscar-inmueble",
+            "#inmueble",
+            "@Url.Action("Buscar", "Inmueble")",
+            function () {
+                return {
+                    fechaInicio: $("#FechaInicio").val(),
+                    fechaFin: $("#FechaFinOriginal").val(),
+                    idReservaExcluir: @Model.IdReserva
+                };
+            });
+    </script>
 }

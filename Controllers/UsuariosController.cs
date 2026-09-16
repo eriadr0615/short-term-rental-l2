@@ -78,9 +78,16 @@ namespace Inmobiliaria.Controllers
         }
 
         [Authorize(Policy = Usuario.RolAdministrador)]
-        public IActionResult Index()
+        public IActionResult Index(int pagina = 1, string? buscar = null)
         {
-            return View(repositorio.ObtenerLista());
+            const int tamanoPagina = 10;
+            pagina = Math.Max(pagina, 1);
+            var lista = repositorio.ObtenerLista(
+                pagina, tamanoPagina, buscar, out int totalRegistros);
+            ViewBag.Pagina = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)tamanoPagina);
+            ViewBag.Buscar = buscar;
+            return View(lista);
         }
 
         [Authorize(Policy = Usuario.RolAdministrador)]

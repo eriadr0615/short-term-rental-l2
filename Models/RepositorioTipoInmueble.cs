@@ -135,5 +135,50 @@ namespace Inmobiliaria.Models
             }
             return tipo;
         }
+
+        public IList<TipoInmueble> ObtenerLista(
+            int pagina,
+            int tamanoPagina,
+            string? buscar,
+            out int totalRegistros)
+        {
+            var lista = new List<TipoInmueble>();
+            string termino = buscar?.Trim() ?? "";
+            int offset = (pagina - 1) * tamanoPagina;
+
+            using var connection = new MySqlConnection(connectionString);
+            connection.Open();
+            using (var count = new MySqlCommand(
+                @"SELECT COUNT(*)
+                  FROM TipoInmueble
+                  WHERE @buscar = '' OR nombre_tipo LIKE @patron", connection))
+            {
+                count.Parameters.AddWithValue("@buscar", termino);
+                count.Parameters.AddWithValue("@patron", $"%{termino}%");
+                totalRegistros = Convert.ToInt32(count.ExecuteScalar());
+            }
+
+            string sql = @"SELECT id_tipo_inmueble, nombre_tipo
+                           FROM TipoInmueble
+                           WHERE @buscar = '' OR nombre_tipo LIKE @patron
+                           ORDER BY nombre_tipo
+                           LIMIT @tamano OFFSET @offset";
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@buscar", termino);
+            command.Parameters.AddWithValue("@patron", $"%{termino}%");
+            command.Parameters.AddWithValue("@tamano", tamanoPagina);
+            command.Parameters.AddWithValue("@offset", offset);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new TipoInmueble
+                {
+                    IdTipoInmueble = Convert.ToInt32(reader["id_tipo_inmueble"]),
+                    NombreTipo = reader["nombre_tipo"].ToString() ?? ""
+                });
+            }
+
+            return lista;
+        }
     }
 }

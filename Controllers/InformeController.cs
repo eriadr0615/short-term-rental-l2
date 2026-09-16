@@ -21,12 +21,17 @@ namespace Inmobiliaria.Controllers
         {
             return View();
         }
-        public IActionResult Inmueble(bool? disponible)
+        public IActionResult Inmueble(bool? disponible, int pagina = 1)
         {
             try
             {
-                var lista = repositorio.InmueblesConPropietario(disponible);
+                const int tamanoPagina = 10;
+                pagina = Math.Max(pagina, 1);
+                var lista = repositorio.InmueblesConPropietario(
+                    disponible, pagina, tamanoPagina, out int totalRegistros);
                 ViewBag.Disponible = disponible;
+                ViewBag.Pagina = pagina;
+                ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)tamanoPagina);
                 return View(lista);
             }
             catch (MySqlException ex)
@@ -83,11 +88,16 @@ namespace Inmobiliaria.Controllers
 
 
 
-        public IActionResult MasReservado()
+        public IActionResult MasReservado(int pagina = 1)
         {
             try
             {
-                var lista = repositorio.InmueblesMasReservados();
+                const int tamanoPagina = 10;
+                pagina = Math.Max(pagina, 1);
+                var lista = repositorio.InmueblesMasReservados(
+                    pagina, tamanoPagina, out int totalRegistros);
+                ViewBag.Pagina = pagina;
+                ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)tamanoPagina);
 
                 return View(lista);
             }

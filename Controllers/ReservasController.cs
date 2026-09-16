@@ -28,13 +28,47 @@ namespace Inmobiliaria.Controllers
             this.repositorioUsuario = repositorioUsuario;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int pagina = 1, string? buscar = null)
         {
-            var lista = repositorio.ObtenerLista();
-            ViewBag.Inquilinos = repositorioInquilino.ObtenerLista();
-            ViewBag.Inmuebles = repositorioInmueble.ObtenerLista();
+            const int tamanoPagina = 10;
+            pagina = Math.Max(pagina, 1);
+            var lista = repositorio.ObtenerLista(
+                pagina, tamanoPagina, buscar, out int totalRegistros);
+            ViewBag.Inquilinos = lista
+                .Select(r => repositorioInquilino.ObtenerPorId(r.IdInquilino))
+                .Where(i => i != null)
+                .ToList();
+            ViewBag.Inmuebles = lista
+                .Select(r => repositorioInmueble.ObtenerPorId(r.IdInmueble))
+                .Where(i => i != null)
+                .ToList();
+            ViewBag.Pagina = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)tamanoPagina);
+            ViewBag.Buscar = buscar;
 
             return View("~/Views/Reserva/Index.cshtml", lista);
+        }
+
+        [HttpGet]
+        public IActionResult Buscar(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Trim().Length < 2)
+            {
+                return Json(Array.Empty<object>());
+            }
+
+            var resultado = repositorio.Buscar(q, 10)
+                .Select(r =>
+                {
+                    var inquilino = repositorioInquilino.ObtenerPorId(r.IdInquilino);
+                    var inmueble = repositorioInmueble.ObtenerPorId(r.IdInmueble);
+                    return new
+                    {
+                        id = r.IdReserva,
+                        texto = $"#{r.IdReserva} - {inquilino?.Nombre} {inquilino?.Apellido} - {inmueble?.DireccionInmueble}"
+                    };
+                });
+            return Json(resultado);
         }
 
         public IActionResult Details(int id)
@@ -58,9 +92,6 @@ namespace Inmobiliaria.Controllers
 
         public IActionResult Create()
         {
-            ViewBag.Inquilinos = repositorioInquilino.ObtenerLista();
-            ViewBag.Inmuebles = repositorioInmueble.ObtenerLista();
-
             return View("~/Views/Reserva/Create.cshtml");
         }
 
@@ -88,8 +119,7 @@ namespace Inmobiliaria.Controllers
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Inquilinos = repositorioInquilino.ObtenerLista();
-                ViewBag.Inmuebles = repositorioInmueble.ObtenerLista();
+                CargarSeleccionesReserva(reserva);
 
                 return View("~/Views/Reserva/Create.cshtml", reserva);
             }
@@ -108,8 +138,7 @@ namespace Inmobiliaria.Controllers
                 return NotFound();
             }
 
-            ViewBag.Inquilinos = repositorioInquilino.ObtenerLista();
-            ViewBag.Inmuebles = repositorioInmueble.ObtenerLista();
+            CargarSeleccionesReserva(reserva);
 
             return View("~/Views/Reserva/Edit.cshtml", reserva);
         }
@@ -154,8 +183,7 @@ namespace Inmobiliaria.Controllers
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Inquilinos = repositorioInquilino.ObtenerLista();
-                ViewBag.Inmuebles = repositorioInmueble.ObtenerLista();
+                CargarSeleccionesReserva(reserva);
 
                 return View("~/Views/Reserva/Edit.cshtml", reserva);
             }
@@ -393,6 +421,12 @@ namespace Inmobiliaria.Controllers
             ViewBag.ReservaOrigen = reserva;
             ViewBag.Inquilino = repositorioInquilino.ObtenerPorId(reserva.IdInquilino);
             ViewBag.Inmueble = repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
+        }
+
+        private void CargarSeleccionesReserva(Reserva reserva)
+        {
+            ViewBag.InquilinoActual = repositorioInquilino.ObtenerPorId(reserva.IdInquilino);
+            ViewBag.InmuebleActual = repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
         }
     }
 }

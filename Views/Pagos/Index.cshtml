@@ -23,6 +23,22 @@
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
+<form method="get" class="row g-2 mb-3">
+    @if (reservaSeleccionada != null)
+    {
+        <input type="hidden" name="idReserva" value="@reservaSeleccionada.IdReserva" />
+    }
+    <div class="col-md-5">
+        <input name="buscar" value="@ViewBag.Buscar" class="form-control"
+               placeholder="Buscar por concepto, reserva, inquilino o inmueble" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-secondary" type="submit">Buscar</button>
+        <a asp-action="Index" asp-route-idReserva="@reservaSeleccionada?.IdReserva"
+           class="btn btn-outline-secondary">Limpiar</a>
+    </div>
+</form>
+
 <table class="table table-striped align-middle">
     <thead>
         <tr>
@@ -80,6 +96,8 @@
         }
     </tbody>
 </table>
+
+<partial name="_Paginacion" />
 
 @if (reservaSeleccionada != null)
 {

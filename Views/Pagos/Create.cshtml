@@ -2,9 +2,7 @@
 
 @{
     ViewData["Title"] = "Registrar pago";
-    var reservas = ViewBag.Reservas as IList<Reserva> ?? new List<Reserva>();
-    var inquilinos = ViewBag.Inquilinos as IList<Inquilino> ?? new List<Inquilino>();
-    var inmuebles = ViewBag.Inmuebles as IList<Inmueble> ?? new List<Inmueble>();
+    var reservaActual = ViewBag.ReservaActual as Reserva;
 }
 
 <h1>Registrar pago</h1>
@@ -24,14 +22,15 @@
 
             <div class="mb-3">
                 <label asp-for="IdReserva" class="form-label">Reserva</label>
-                <select asp-for="IdReserva" class="form-select">
+                <input id="buscar-reserva" class="form-control mb-1"
+                       placeholder="Buscar por número, inquilino, DNI o inmueble"
+                       autocomplete="off" />
+                <select asp-for="IdReserva" id="reserva" class="form-select">
                     <option value="0">Seleccione una reserva</option>
-                    @foreach (var reserva in reservas)
+                    @if (reservaActual != null)
                     {
-                        var inquilino = inquilinos.FirstOrDefault(i => i.IdInquilino == reserva.IdInquilino);
-                        var inmueble = inmuebles.FirstOrDefault(i => i.IdInmueble == reserva.IdInmueble);
-                        <option value="@reserva.IdReserva">
-                            #@reserva.IdReserva - @(inquilino == null ? "Inquilino no encontrado" : $"{inquilino.Nombre} {inquilino.Apellido}") - @(inmueble?.DireccionInmueble ?? "Inmueble no encontrado")
+                        <option value="@reservaActual.IdReserva" selected>
+                            Reserva #@reservaActual.IdReserva
                         </option>
                     }
                 </select>
@@ -64,4 +63,11 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <partial name="_BusquedaAjaxScripts" />
+    <script>
+        configurarBusquedaAjax(
+            "#buscar-reserva",
+            "#reserva",
+            "@Url.Action("Buscar", "Reservas")");
+    </script>
 }

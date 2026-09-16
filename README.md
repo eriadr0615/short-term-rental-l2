@@ -42,6 +42,8 @@ Esquema de modelo de datos perteneciente a la app:
 - anulación lógica de pagos por un Administrador, conservando la auditoría
 - finalización anticipada con cálculo y registro del pago de la multa
 - renovación mediante una reserva nueva, sin modificar la reserva original
+- paginado y búsquedas resueltas en el servidor
+- selección por búsqueda AJAX en los formularios relacionados
 
 #### Diagrama
 

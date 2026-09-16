@@ -1,0 +1,41 @@
+@{
+    int pagina = ViewBag.Pagina ?? 1;
+    int totalPaginas = ViewBag.TotalPaginas ?? 0;
+    string? buscar = ViewBag.Buscar as string;
+    int? idReserva = ViewBag.IdReserva as int?;
+    bool? disponible = ViewBag.Disponible as bool?;
+}
+
+@if (totalPaginas > 1)
+{
+    <nav aria-label="Paginación">
+        <ul class="pagination">
+            <li class="page-item @(pagina <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-route-pagina="@(pagina - 1)"
+                   asp-route-buscar="@buscar"
+                   asp-route-idReserva="@idReserva"
+                   asp-route-disponible="@disponible">Anterior</a>
+            </li>
+
+            @for (int numero = 1; numero <= totalPaginas; numero++)
+            {
+                <li class="page-item @(numero == pagina ? "active" : "")">
+                    <a class="page-link"
+                       asp-route-pagina="@numero"
+                       asp-route-buscar="@buscar"
+                       asp-route-idReserva="@idReserva"
+                       asp-route-disponible="@disponible">@numero</a>
+                </li>
+            }
+
+            <li class="page-item @(pagina >= totalPaginas ? "disabled" : "")">
+                <a class="page-link"
+                   asp-route-pagina="@(pagina + 1)"
+                   asp-route-buscar="@buscar"
+                   asp-route-idReserva="@idReserva"
+                   asp-route-disponible="@disponible">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+}

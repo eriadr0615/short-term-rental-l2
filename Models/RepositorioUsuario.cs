@@ -147,6 +147,50 @@ namespace Inmobiliaria.Models
             return command.ExecuteNonQuery();
         }
 
+        public IList<Usuario> ObtenerLista(
+            int pagina,
+            int tamanoPagina,
+            string? buscar,
+            out int totalRegistros)
+        {
+            var lista = new List<Usuario>();
+            string termino = buscar?.Trim() ?? "";
+            int offset = (pagina - 1) * tamanoPagina;
+
+            using var connection = new MySqlConnection(connectionString);
+            connection.Open();
+            string filtro = @"WHERE @buscar = ''
+                              OR nombre_usuario LIKE @patron
+                              OR correo_usuario LIKE @patron
+                              OR rol_usuario LIKE @patron";
+            using (var count = new MySqlCommand(
+                $"SELECT COUNT(*) FROM Usuario {filtro}", connection))
+            {
+                count.Parameters.AddWithValue("@buscar", termino);
+                count.Parameters.AddWithValue("@patron", $"%{termino}%");
+                totalRegistros = Convert.ToInt32(count.ExecuteScalar());
+            }
+
+            string sql = $@"SELECT id_usuario, avatar, nombre_usuario, correo_usuario,
+                                   contrasenia_hash, rol_usuario, activo
+                            FROM Usuario
+                            {filtro}
+                            ORDER BY nombre_usuario
+                            LIMIT @tamano OFFSET @offset";
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@buscar", termino);
+            command.Parameters.AddWithValue("@patron", $"%{termino}%");
+            command.Parameters.AddWithValue("@tamano", tamanoPagina);
+            command.Parameters.AddWithValue("@offset", offset);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(Mapear(reader));
+            }
+
+            return lista;
+        }
+
         private static Usuario Mapear(MySqlDataReader reader)
         {
             return new Usuario

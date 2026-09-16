@@ -24,18 +24,45 @@ namespace Inmobiliaria.Controllers
             this.repositorioImagen = repositorioImagen;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int pagina = 1, string? buscar = null)
         {
-            var lista = repositorio.ObtenerLista();
+            const int tamanoPagina = 10;
+            pagina = Math.Max(pagina, 1);
+            var lista = repositorio.ObtenerLista(
+                pagina, tamanoPagina, buscar, out int totalRegistros);
 
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
+            ViewBag.Pagina = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)tamanoPagina);
+            ViewBag.Buscar = buscar;
 
             return View(lista);
         }
 
+        [HttpGet]
+        public IActionResult Buscar(
+            string q,
+            DateTime? fechaInicio,
+            DateTime? fechaFin,
+            int? idReservaExcluir)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Trim().Length < 2)
+            {
+                return Json(Array.Empty<object>());
+            }
+
+            var resultado = repositorio.BuscarDisponibles(
+                    q, fechaInicio, fechaFin, idReservaExcluir, 10)
+                .Select(i => new
+                {
+                    id = i.IdInmueble,
+                    texto = i.DireccionInmueble
+                });
+            return Json(resultado);
+        }
+
         public IActionResult Create()
         {
-            ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
 
             return View();
@@ -52,7 +79,7 @@ namespace Inmobiliaria.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
+            ViewBag.PropietarioActual = repositorioPropietario.ObtenerPorId(inmueble.IdPropietario);
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
 
             return View(inmueble);
@@ -67,7 +94,7 @@ namespace Inmobiliaria.Controllers
                 return NotFound();
             }
 
-            ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
+            ViewBag.PropietarioActual = repositorioPropietario.ObtenerPorId(inmueble.IdPropietario);
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
 
             return View(inmueble);
@@ -84,7 +111,7 @@ namespace Inmobiliaria.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Propietarios = repositorioPropietario.ObtenerLista();
+            ViewBag.PropietarioActual = repositorioPropietario.ObtenerPorId(inmueble.IdPropietario);
             ViewBag.TiposInmueble = repositorioTipoInmueble.ObtenerLista();
 
             return View(inmueble);

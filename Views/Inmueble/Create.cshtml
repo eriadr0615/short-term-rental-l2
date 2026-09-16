@@ -1,8 +1,9 @@
 @model Inmobiliaria.Models.Inmueble
 
 @{
-    var propietarios = ViewBag.Propietarios as IList<Inmobiliaria.Models.Propietario>;
-    var tipos = ViewBag.TiposInmueble as IList<Inmobiliaria.Models.TipoInmueble>;
+    var propietarioActual = ViewBag.PropietarioActual as Inmobiliaria.Models.Propietario;
+    var tipos = ViewBag.TiposInmueble as IList<Inmobiliaria.Models.TipoInmueble>
+        ?? new List<Inmobiliaria.Models.TipoInmueble>();
 }
 
 <h1>Nuevo inmueble</h1>
@@ -14,14 +15,14 @@
 
     <div class="form-group">
         <label>Propietario</label>
-
-        <select asp-for="IdPropietario" class="form-control">
-            <option value="">Seleccione de la lista, el propietario</option>
-
-            @foreach (var propietario in propietarios)
+        <input id="buscar-propietario" class="form-control mb-1"
+               placeholder="Escriba al menos 2 caracteres para buscar" autocomplete="off" />
+        <select asp-for="IdPropietario" id="propietario" class="form-select">
+            <option value="">Seleccione un propietario</option>
+            @if (propietarioActual != null)
             {
-                <option value="@propietario.IdPropietario">
-                    @propietario.Nombre @propietario.Apellido
+                <option value="@propietarioActual.IdPropietario" selected>
+                    @propietarioActual.Nombre @propietarioActual.Apellido - DNI @propietarioActual.Dni
                 </option>
             }
         </select>
@@ -83,3 +84,14 @@
         Cancelar
     </a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_BusquedaAjaxScripts" />
+    <script>
+        configurarBusquedaAjax(
+            "#buscar-propietario",
+            "#propietario",
+            "@Url.Action("Buscar", "Propietarios")");
+    </script>
+}

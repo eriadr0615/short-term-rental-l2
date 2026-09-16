@@ -28,9 +28,13 @@ namespace Inmobiliaria.Controllers
             this.repositorioUsuario = repositorioUsuario;
         }
 
-        public IActionResult Index(int? idReserva)
+        public IActionResult Index(
+            int? idReserva,
+            int pagina = 1,
+            string? buscar = null)
         {
-            CargarReservas();
+            const int tamanoPagina = 10;
+            pagina = Math.Max(pagina, 1);
 
             if (idReserva.HasValue)
             {
@@ -41,10 +45,20 @@ namespace Inmobiliaria.Controllers
                 }
 
                 ViewBag.ReservaSeleccionada = reserva;
-                return View(repositorio.ObtenerPorReserva(idReserva.Value));
             }
 
-            return View(repositorio.ObtenerLista());
+            var lista = repositorio.ObtenerLista(
+                pagina,
+                tamanoPagina,
+                buscar,
+                idReserva,
+                out int totalRegistros);
+            CargarDatosListado(lista);
+            ViewBag.Pagina = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)tamanoPagina);
+            ViewBag.Buscar = buscar;
+            ViewBag.IdReserva = idReserva;
+            return View(lista);
         }
 
         public IActionResult Details(int id)
@@ -61,7 +75,6 @@ namespace Inmobiliaria.Controllers
 
         public IActionResult Create(int? idReserva)
         {
-            CargarReservas();
             var pago = new Pago
             {
                 IdReserva = idReserva ?? 0,
@@ -76,6 +89,7 @@ namespace Inmobiliaria.Controllers
                     return NotFound();
                 }
 
+                ViewBag.ReservaActual = reserva;
                 ConfigurarPagoInicial(pago, reserva);
             }
 
@@ -109,9 +123,9 @@ namespace Inmobiliaria.Controllers
 
             if (!ModelState.IsValid)
             {
-                CargarReservas();
                 if (reserva != null)
                 {
+                    ViewBag.ReservaActual = reserva;
                     ConfigurarPagoInicial(pago, reserva, completarValores: false);
                 }
                 return View(pago);
@@ -224,11 +238,21 @@ namespace Inmobiliaria.Controllers
             return int.TryParse(valor, out int id) ? id : 0;
         }
 
-        private void CargarReservas()
+        private void CargarDatosListado(IList<Pago> pagos)
         {
-            ViewBag.Reservas = repositorioReserva.ObtenerLista();
-            ViewBag.Inquilinos = repositorioInquilino.ObtenerLista();
-            ViewBag.Inmuebles = repositorioInmueble.ObtenerLista();
+            var reservas = pagos
+                .Select(p => repositorioReserva.ObtenerPorId(p.IdReserva))
+                .Where(r => r != null)
+                .ToList();
+            ViewBag.Reservas = reservas;
+            ViewBag.Inquilinos = reservas
+                .Select(r => repositorioInquilino.ObtenerPorId(r!.IdInquilino))
+                .Where(i => i != null)
+                .ToList();
+            ViewBag.Inmuebles = reservas
+                .Select(r => repositorioInmueble.ObtenerPorId(r!.IdInmueble))
+                .Where(i => i != null)
+                .ToList();
         }
 
         private void CargarDetalle(Pago pago)

@@ -6,5 +6,10 @@ namespace Inmobiliaria.Models
         int ActualizarClave(int id, string contraseniaHash);
         int ActualizarAvatar(int id, string? avatar);
         int CambiarEstado(int id, bool activo);
+        IList<Usuario> ObtenerLista(
+            int pagina,
+            int tamanoPagina,
+            string? buscar,
+            out int totalRegistros);
     }
 }

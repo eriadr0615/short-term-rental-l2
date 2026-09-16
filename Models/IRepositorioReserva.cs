@@ -9,5 +9,13 @@ namespace Inmobiliaria.Models
             int? idReservaExcluir);
 
         int Finalizar(int idReserva, DateTime fechaFinalizacion, int idUsuarioFinalizacion);
+
+        IList<Reserva> ObtenerLista(
+            int pagina,
+            int tamanoPagina,
+            string? buscar,
+            out int totalRegistros);
+
+        IList<Reserva> Buscar(string termino, int cantidad);
     }
 }

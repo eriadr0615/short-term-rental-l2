@@ -8,11 +8,27 @@ namespace Inmobiliaria.Models
             : base(configuration)
         {
         }
-        public IList<InformeInmueble> InmueblesConPropietario(bool? disponible)
+        public IList<InformeInmueble> InmueblesConPropietario(
+            bool? disponible,
+            int pagina,
+            int tamanoPagina,
+            out int totalRegistros)
         {
             IList<InformeInmueble> lista = new List<InformeInmueble>();
             using (var connection = new MySqlConnection(connectionString))
             {
+                connection.Open();
+                using (var count = new MySqlCommand(
+                    @"SELECT COUNT(*)
+                      FROM Inmueble
+                      WHERE (@disponible IS NULL OR disponible = @disponible)",
+                    connection))
+                {
+                    count.Parameters.AddWithValue(
+                        "@disponible", (object?)disponible ?? DBNull.Value);
+                    totalRegistros = Convert.ToInt32(count.ExecuteScalar());
+                }
+
                 string sql = @"
                     SELECT
                         i.id_inmueble,
@@ -30,7 +46,8 @@ namespace Inmobiliaria.Models
                         ON i.id_tipo_inmueble = t.id_tipo_inmueble
                     WHERE (@disponible IS NULL
                            OR i.disponible = @disponible)
-                    ORDER BY i.direccion_inmueble;";
+                    ORDER BY i.direccion_inmueble
+                    LIMIT @tamano OFFSET @offset;";
 
                 using (var command = new MySqlCommand(sql, connection))
                 {
@@ -38,8 +55,9 @@ namespace Inmobiliaria.Models
                         "@disponible",
                         (object?)disponible ?? DBNull.Value
                     );
-
-                    connection.Open();
+                    command.Parameters.AddWithValue("@tamano", tamanoPagina);
+                    command.Parameters.AddWithValue(
+                        "@offset", (pagina - 1) * tamanoPagina);
 
                     var reader = command.ExecuteReader();
                     while (reader.Read())
@@ -69,11 +87,24 @@ namespace Inmobiliaria.Models
         }
 
 
-        public IList<InformeInmueble> InmueblesMasReservados()
+        public IList<InformeInmueble> InmueblesMasReservados(
+            int pagina,
+            int tamanoPagina,
+            out int totalRegistros)
         {
             IList<InformeInmueble> lista = new List<InformeInmueble>();
             using (var connection = new MySqlConnection(connectionString))
             {
+                connection.Open();
+                using (var count = new MySqlCommand(
+                    @"SELECT COUNT(DISTINCT id_inmueble)
+                      FROM Reserva
+                      WHERE fecha_inicio >= DATE_SUB(CURDATE(), INTERVAL 365 DAY)
+                        AND fecha_inicio <= CURDATE()", connection))
+                {
+                    totalRegistros = Convert.ToInt32(count.ExecuteScalar());
+                }
+
                 string sql = @"
                     SELECT
                         i.id_inmueble,
@@ -97,10 +128,13 @@ namespace Inmobiliaria.Models
                         t.nombre_tipo,
                         p.nombre,
                         p.apellido
-                    ORDER BY cantidad_reservas DESC;";
+                    ORDER BY cantidad_reservas DESC
+                    LIMIT @tamano OFFSET @offset;";
                 using (var command = new MySqlCommand(sql, connection))
                 {
-                    connection.Open();
+                    command.Parameters.AddWithValue("@tamano", tamanoPagina);
+                    command.Parameters.AddWithValue(
+                        "@offset", (pagina - 1) * tamanoPagina);
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())

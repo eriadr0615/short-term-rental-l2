@@ -1,0 +1,30 @@
+<script>
+    function configurarBusquedaAjax(inputId, selectId, url, parametrosExtra) {
+        let espera;
+        const entrada = $(inputId);
+        const selector = $(selectId);
+
+        entrada.on("input", function () {
+            clearTimeout(espera);
+            const termino = entrada.val().trim();
+            if (termino.length < 2) {
+                return;
+            }
+
+            espera = setTimeout(function () {
+                const parametros = { q: termino };
+                if (parametrosExtra) {
+                    Object.assign(parametros, parametrosExtra());
+                }
+
+                $.get(url, parametros, function (datos) {
+                    selector.empty();
+                    selector.append(new Option("Seleccione una opción", ""));
+                    datos.forEach(function (item) {
+                        selector.append(new Option(item.texto, item.id));
+                    });
+                });
+            }, 300);
+        });
+    }
+</script>

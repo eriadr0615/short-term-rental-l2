@@ -293,5 +293,119 @@ namespace Inmobiliaria.Models
             connection.Open();
             return command.ExecuteNonQuery();
         }
+
+        public IList<Reserva> ObtenerLista(
+            int pagina,
+            int tamanoPagina,
+            string? buscar,
+            out int totalRegistros)
+        {
+            var lista = new List<Reserva>();
+            string termino = buscar?.Trim() ?? "";
+            int offset = (pagina - 1) * tamanoPagina;
+
+            using var connection = new MySqlConnection(connectionString);
+            connection.Open();
+            string tablas = @"FROM Reserva r
+                              INNER JOIN Inquilino q
+                                  ON r.id_inquilino = q.id_inquilino
+                              INNER JOIN Inmueble i
+                                  ON r.id_inmueble = i.id_inmueble";
+            string filtro = @"WHERE @buscar = ''
+                              OR CAST(r.id_reserva AS CHAR) LIKE @patron
+                              OR q.dni LIKE @patron
+                              OR q.nombre LIKE @patron
+                              OR q.apellido LIKE @patron
+                              OR i.direccion_inmueble LIKE @patron";
+
+            using (var count = new MySqlCommand(
+                $"SELECT COUNT(*) {tablas} {filtro}", connection))
+            {
+                count.Parameters.AddWithValue("@buscar", termino);
+                count.Parameters.AddWithValue("@patron", $"%{termino}%");
+                totalRegistros = Convert.ToInt32(count.ExecuteScalar());
+            }
+
+            string sql = $@"SELECT r.id_reserva, r.id_inquilino, r.id_inmueble,
+                                   r.fecha_inicio, r.fecha_fin_original, r.monto_dia,
+                                   r.fecha_finalizacion_anticipada,
+                                   r.id_usuario_creacion, r.id_usuario_finalizacion,
+                                   r.id_reserva_origen
+                            {tablas}
+                            {filtro}
+                            ORDER BY r.fecha_inicio DESC, r.id_reserva DESC
+                            LIMIT @tamano OFFSET @offset";
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@buscar", termino);
+            command.Parameters.AddWithValue("@patron", $"%{termino}%");
+            command.Parameters.AddWithValue("@tamano", tamanoPagina);
+            command.Parameters.AddWithValue("@offset", offset);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(Mapear(reader));
+            }
+
+            return lista;
+        }
+
+        public IList<Reserva> Buscar(string termino, int cantidad)
+        {
+            var lista = new List<Reserva>();
+            using var connection = new MySqlConnection(connectionString);
+            string sql = @"SELECT r.id_reserva, r.id_inquilino, r.id_inmueble,
+                                  r.fecha_inicio, r.fecha_fin_original, r.monto_dia,
+                                  r.fecha_finalizacion_anticipada,
+                                  r.id_usuario_creacion, r.id_usuario_finalizacion,
+                                  r.id_reserva_origen
+                           FROM Reserva r
+                           INNER JOIN Inquilino q
+                               ON r.id_inquilino = q.id_inquilino
+                           INNER JOIN Inmueble i
+                               ON r.id_inmueble = i.id_inmueble
+                           WHERE CAST(r.id_reserva AS CHAR) LIKE @patron
+                              OR q.dni LIKE @patron
+                              OR q.nombre LIKE @patron
+                              OR q.apellido LIKE @patron
+                              OR i.direccion_inmueble LIKE @patron
+                           ORDER BY r.fecha_inicio DESC, r.id_reserva DESC
+                           LIMIT @cantidad";
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@patron", $"%{termino.Trim()}%");
+            command.Parameters.AddWithValue("@cantidad", cantidad);
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(Mapear(reader));
+            }
+
+            return lista;
+        }
+
+        private static Reserva Mapear(MySqlDataReader reader)
+        {
+            return new Reserva
+            {
+                IdReserva = Convert.ToInt32(reader["id_reserva"]),
+                IdInquilino = Convert.ToInt32(reader["id_inquilino"]),
+                IdInmueble = Convert.ToInt32(reader["id_inmueble"]),
+                FechaInicio = Convert.ToDateTime(reader["fecha_inicio"]),
+                FechaFinOriginal = Convert.ToDateTime(reader["fecha_fin_original"]),
+                MontoDia = Convert.ToDecimal(reader["monto_dia"]),
+                FechaFinalizacionAnticipada = reader["fecha_finalizacion_anticipada"] == DBNull.Value
+                    ? null
+                    : Convert.ToDateTime(reader["fecha_finalizacion_anticipada"]),
+                IdUsuarioCreacion = reader["id_usuario_creacion"] == DBNull.Value
+                    ? null
+                    : Convert.ToInt32(reader["id_usuario_creacion"]),
+                IdUsuarioFinalizacion = reader["id_usuario_finalizacion"] == DBNull.Value
+                    ? null
+                    : Convert.ToInt32(reader["id_usuario_finalizacion"]),
+                IdReservaOrigen = reader["id_reserva_origen"] == DBNull.Value
+                    ? null
+                    : Convert.ToInt32(reader["id_reserva_origen"])
+            };
+        }
     }
 }

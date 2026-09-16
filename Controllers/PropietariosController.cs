@@ -15,10 +15,33 @@ namespace Inmobiliaria.Controllers
         }
 
         // LISTAR
-        public IActionResult Index()
+        public IActionResult Index(int pagina = 1, string? buscar = null)
         {
-            var lista = repositorio.ObtenerLista();
+            const int tamanoPagina = 10;
+            pagina = Math.Max(pagina, 1);
+            var lista = repositorio.ObtenerLista(
+                pagina, tamanoPagina, buscar, out int totalRegistros);
+            ViewBag.Pagina = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)tamanoPagina);
+            ViewBag.Buscar = buscar;
             return View(lista);
+        }
+
+        [HttpGet]
+        public IActionResult Buscar(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Trim().Length < 2)
+            {
+                return Json(Array.Empty<object>());
+            }
+
+            var resultado = repositorio.Buscar(q, 10)
+                .Select(p => new
+                {
+                    id = p.IdPropietario,
+                    texto = $"{p.Nombre} {p.Apellido} - DNI {p.Dni}"
+                });
+            return Json(resultado);
         }
 
         // ALTA - mostrar formulario

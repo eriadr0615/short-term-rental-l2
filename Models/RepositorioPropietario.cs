@@ -185,5 +185,94 @@ namespace Inmobiliaria.Models
 
             return p;
         }
+
+        public IList<Propietario> ObtenerLista(
+            int pagina,
+            int tamanoPagina,
+            string? buscar,
+            out int totalRegistros)
+        {
+            var lista = new List<Propietario>();
+            string termino = buscar?.Trim() ?? "";
+            int offset = (pagina - 1) * tamanoPagina;
+
+            using var connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string filtro = @"WHERE @buscar = ''
+                              OR dni LIKE @patron
+                              OR nombre LIKE @patron
+                              OR apellido LIKE @patron
+                              OR correo LIKE @patron";
+
+            using (var count = new MySqlCommand(
+                $"SELECT COUNT(*) FROM Propietario {filtro}", connection))
+            {
+                count.Parameters.AddWithValue("@buscar", termino);
+                count.Parameters.AddWithValue("@patron", $"%{termino}%");
+                totalRegistros = Convert.ToInt32(count.ExecuteScalar());
+            }
+
+            string sql = $@"SELECT id_propietario, dni, nombre, apellido,
+                                   telefono, correo, direccion
+                            FROM Propietario
+                            {filtro}
+                            ORDER BY apellido, nombre, id_propietario
+                            LIMIT @tamano OFFSET @offset";
+
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@buscar", termino);
+            command.Parameters.AddWithValue("@patron", $"%{termino}%");
+            command.Parameters.AddWithValue("@tamano", tamanoPagina);
+            command.Parameters.AddWithValue("@offset", offset);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(Mapear(reader));
+            }
+
+            return lista;
+        }
+
+        public IList<Propietario> Buscar(string termino, int cantidad)
+        {
+            var lista = new List<Propietario>();
+            using var connection = new MySqlConnection(connectionString);
+            string sql = @"SELECT id_propietario, dni, nombre, apellido,
+                                  telefono, correo, direccion
+                           FROM Propietario
+                           WHERE dni LIKE @patron
+                              OR nombre LIKE @patron
+                              OR apellido LIKE @patron
+                              OR CONCAT(nombre, ' ', apellido) LIKE @patron
+                           ORDER BY apellido, nombre
+                           LIMIT @cantidad";
+
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@patron", $"%{termino.Trim()}%");
+            command.Parameters.AddWithValue("@cantidad", cantidad);
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(Mapear(reader));
+            }
+
+            return lista;
+        }
+
+        private static Propietario Mapear(MySqlDataReader reader)
+        {
+            return new Propietario
+            {
+                IdPropietario = Convert.ToInt32(reader["id_propietario"]),
+                Dni = reader["dni"].ToString() ?? "",
+                Nombre = reader["nombre"].ToString() ?? "",
+                Apellido = reader["apellido"].ToString() ?? "",
+                Telefono = reader["telefono"].ToString() ?? "",
+                Correo = reader["correo"].ToString() ?? "",
+                Direccion = reader["direccion"].ToString() ?? ""
+            };
+        }
     }
 }
