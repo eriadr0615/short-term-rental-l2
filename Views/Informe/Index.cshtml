@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Informes";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Informes</h2>
+    <div class="list-group">
+        <a asp-controller="Informe"
+           asp-action="Inmueble"
+           class="list-group-item list-group-item-action">
+            Inmuebles y propietarios
+        </a>
+
+        <a asp-controller="Informe"
+            asp-action="MasReservado"
+            class="list-group-item list-group-item-action">
+            Inmuebles mas reservados en los ultimos 365 dias
+        </a>
+
+ 
+    </div>
+</div>

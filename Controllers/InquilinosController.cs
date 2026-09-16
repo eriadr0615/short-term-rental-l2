@@ -28,7 +28,6 @@ namespace Inmobiliaria.Controllers
             {
                 return NotFound();
             }
-
             return View("~/Views/Inquilino/Details.cshtml", inquilino);
         }
 
@@ -45,7 +44,6 @@ namespace Inmobiliaria.Controllers
             {
                 return View("~/Views/Inquilino/Create.cshtml", inquilino);
             }
-
             repositorio.Alta(inquilino);
             return RedirectToAction(nameof(Index));
         }
@@ -58,7 +56,6 @@ namespace Inmobiliaria.Controllers
             {
                 return NotFound();
             }
-
             return View("~/Views/Inquilino/Edit.cshtml", inquilino);    
         }
 
@@ -70,12 +67,10 @@ namespace Inmobiliaria.Controllers
             {
                 return BadRequest();
             }
-
             if (!ModelState.IsValid)
             {
                 return View("~/Views/Inquilino/Edit.cshtml", inquilino);
             }
-
             repositorio.Modificacion(inquilino);
             return RedirectToAction(nameof(Index));
         }
