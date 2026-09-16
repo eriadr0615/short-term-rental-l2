@@ -1,0 +1,57 @@
+@model Inmobiliaria.Models.RenovarReservaView
+
+@{
+    ViewData["Title"] = "Renovar reserva";
+    var reservaOrigen = ViewBag.ReservaOrigen as Inmobiliaria.Models.Reserva;
+    var inquilino = ViewBag.Inquilino as Inmobiliaria.Models.Inquilino;
+    var inmueble = ViewBag.Inmueble as Inmobiliaria.Models.Inmueble;
+}
+
+<h1>Renovar reserva</h1>
+
+<div class="alert alert-info">
+    La renovación crea una reserva nueva. La reserva original #@Model.IdReservaOrigen no será modificada.
+</div>
+
+<div class="mb-3">
+    <p><strong>Inquilino:</strong> @(inquilino == null ? "No encontrado" : $"{inquilino.Nombre} {inquilino.Apellido}")</p>
+    <p><strong>Inmueble:</strong> @(inmueble?.DireccionInmueble ?? "No encontrado")</p>
+    @if (reservaOrigen != null)
+    {
+        <p><strong>Período de la reserva original:</strong> @reservaOrigen.FechaInicio.ToString("dd/MM/yyyy") al @reservaOrigen.FechaFinOriginal.ToString("dd/MM/yyyy")</p>
+    }
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Renovar" method="post">
+            <input asp-for="IdReservaOrigen" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="FechaInicio" class="form-label">Nueva fecha de inicio</label>
+                <input asp-for="FechaInicio" type="date" class="form-control" />
+                <span asp-validation-for="FechaInicio" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FechaFin" class="form-label">Nueva fecha de finalización</label>
+                <input asp-for="FechaFin" type="date" class="form-control" />
+                <span asp-validation-for="FechaFin" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MontoDia" class="form-label">Nuevo monto por día</label>
+                <input asp-for="MontoDia" class="form-control" />
+                <span asp-validation-for="MontoDia" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Crear renovación</button>
+            <a asp-action="Details" asp-route-id="@Model.IdReservaOrigen" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

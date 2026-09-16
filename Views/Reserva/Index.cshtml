@@ -20,7 +20,8 @@
             <th>Inquilino</th>
             <th>Inmueble</th>
             <th>Fecha de inicio</th>
-            <th>Fecha de fin</th>
+            <th>Fecha de fin original</th>
+            <th>Finalización anticipada</th>
             <th>Monto por día</th>
             <th></th>
         </tr>
@@ -36,7 +37,8 @@
             <td>@(inmueble == null ? "No encontrado" : inmueble.DireccionInmueble)</td>
             <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
             <td>@item.FechaFinOriginal.ToString("dd/MM/yyyy")</td>
-            <td>@item.MontoDia</td>
+            <td>@(item.FechaFinalizacionAnticipada?.ToString("dd/MM/yyyy") ?? "-")</td>
+            <td>@item.MontoDia.ToString("C")</td>
             <td class="text-nowrap">
                 <a asp-action="Details" asp-route-id="@item.IdReserva">Detalle</a> |
                 <a asp-action="Edit" asp-route-id="@item.IdReserva">Editar</a>

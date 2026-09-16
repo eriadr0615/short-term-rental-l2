@@ -40,6 +40,8 @@ Esquema de modelo de datos perteneciente a la app:
 - registro y consulta de pagos asociados a reservas
 - modificación exclusiva del concepto del pago
 - anulación lógica de pagos por un Administrador, conservando la auditoría
+- finalización anticipada con cálculo y registro del pago de la multa
+- renovación mediante una reserva nueva, sin modificar la reserva original
 
 #### Diagrama
 

@@ -7,5 +7,7 @@ namespace Inmobiliaria.Models
             DateTime fechaInicio,
             DateTime fechaFin,
             int? idReservaExcluir);
+
+        int Finalizar(int idReserva, DateTime fechaFinalizacion, int idUsuarioFinalizacion);
     }
 }

@@ -4,6 +4,10 @@
     ViewData["Title"] = "Detalle de reserva";
     var inquilino = ViewBag.Inquilino as Inmobiliaria.Models.Inquilino;
     var inmueble = ViewBag.Inmueble as Inmobiliaria.Models.Inmueble;
+    var usuarios = ViewBag.Usuarios as IList<Inmobiliaria.Models.Usuario>
+        ?? new List<Inmobiliaria.Models.Usuario>();
+    var usuarioCreacion = usuarios.FirstOrDefault(u => u.IdUsuario == Model.IdUsuarioCreacion);
+    var usuarioFinalizacion = usuarios.FirstOrDefault(u => u.IdUsuario == Model.IdUsuarioFinalizacion);
 }
 
 <h1>Detalle de reserva</h1>
@@ -32,10 +36,34 @@
         </dd>
         <dt class="col-sm-2">Fecha de inicio</dt>
         <dd class="col-sm-10">@Model.FechaInicio.ToString("dd/MM/yyyy")</dd>
-        <dt class="col-sm-2">Fecha de fin</dt>
+        <dt class="col-sm-2">Fecha de fin original</dt>
         <dd class="col-sm-10">@Model.FechaFinOriginal.ToString("dd/MM/yyyy")</dd>
+        @if (Model.FechaFinalizacionAnticipada.HasValue)
+        {
+            <dt class="col-sm-2">Finalización anticipada</dt>
+            <dd class="col-sm-10">@Model.FechaFinalizacionAnticipada.Value.ToString("dd/MM/yyyy")</dd>
+        }
         <dt class="col-sm-2">Monto por día</dt>
-        <dd class="col-sm-10">@Model.MontoDia</dd>
+        <dd class="col-sm-10">@Model.MontoDia.ToString("C")</dd>
+        @if (Model.IdReservaOrigen.HasValue)
+        {
+            <dt class="col-sm-2">Renovación de</dt>
+            <dd class="col-sm-10">
+                <a asp-action="Details" asp-route-id="@Model.IdReservaOrigen.Value">
+                    Reserva #@Model.IdReservaOrigen.Value
+                </a>
+            </dd>
+        }
+        @if (User.IsInRole(Inmobiliaria.Models.Usuario.RolAdministrador))
+        {
+            <dt class="col-sm-2">Creada por</dt>
+            <dd class="col-sm-10">@(usuarioCreacion?.NombreUsuario ?? "Sin registrar")</dd>
+            @if (Model.FechaFinalizacionAnticipada.HasValue)
+            {
+                <dt class="col-sm-2">Finalizada por</dt>
+                <dd class="col-sm-10">@(usuarioFinalizacion?.NombreUsuario ?? "Sin registrar")</dd>
+            }
+        }
     </dl>
 </div>
 
@@ -43,5 +71,12 @@
     <a asp-action="Edit" asp-route-id="@Model.IdReserva" class="btn btn-primary">Editar</a>
     <a asp-controller="Pagos" asp-action="Index" asp-route-idReserva="@Model.IdReserva"
        class="btn btn-success">Ver pagos</a>
+    @if (!Model.FechaFinalizacionAnticipada.HasValue)
+    {
+        <a asp-action="Finalizar" asp-route-id="@Model.IdReserva" class="btn btn-warning">
+            Finalizar anticipadamente
+        </a>
+    }
+    <a asp-action="Renovar" asp-route-id="@Model.IdReserva" class="btn btn-info">Renovar</a>
     <a asp-action="Index" class="btn btn-secondary">Volver</a>
 </div>

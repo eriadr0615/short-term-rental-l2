@@ -252,7 +252,7 @@ namespace Inmobiliaria.Models
                                FROM Reserva
                                WHERE id_inmueble = @idInmueble
                                  AND fecha_inicio < @fechaFin
-                                 AND fecha_fin_original > @fechaInicio
+                                 AND COALESCE(fecha_finalizacion_anticipada, fecha_fin_original) > @fechaInicio
                                  AND (@idReservaExcluir IS NULL
                                       OR id_reserva <> @idReservaExcluir)";
 
@@ -272,6 +272,26 @@ namespace Inmobiliaria.Models
             }
 
             return existe;
+        }
+
+        public int Finalizar(
+            int idReserva,
+            DateTime fechaFinalizacion,
+            int idUsuarioFinalizacion)
+        {
+            using var connection = new MySqlConnection(connectionString);
+            string sql = @"UPDATE Reserva
+                           SET fecha_finalizacion_anticipada = @fechaFinalizacion,
+                               id_usuario_finalizacion = @idUsuarioFinalizacion
+                           WHERE id_reserva = @idReserva
+                             AND fecha_finalizacion_anticipada IS NULL";
+
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@fechaFinalizacion", fechaFinalizacion);
+            command.Parameters.AddWithValue("@idUsuarioFinalizacion", idUsuarioFinalizacion);
+            command.Parameters.AddWithValue("@idReserva", idReserva);
+            connection.Open();
+            return command.ExecuteNonQuery();
         }
     }
 }

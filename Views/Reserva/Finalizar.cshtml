@@ -1,0 +1,69 @@
+@model Inmobiliaria.Models.FinalizarReservaView
+
+@{
+    ViewData["Title"] = "Finalización anticipada";
+    var reserva = ViewBag.Reserva as Inmobiliaria.Models.Reserva;
+    var inquilino = ViewBag.Inquilino as Inmobiliaria.Models.Inquilino;
+    var inmueble = ViewBag.Inmueble as Inmobiliaria.Models.Inmueble;
+}
+
+<h1>Finalización anticipada</h1>
+
+<div class="mb-3">
+    <p><strong>Reserva:</strong> #@Model.IdReserva</p>
+    <p><strong>Inquilino:</strong> @(inquilino == null ? "No encontrado" : $"{inquilino.Nombre} {inquilino.Apellido}")</p>
+    <p><strong>Inmueble:</strong> @(inmueble?.DireccionInmueble ?? "No encontrado")</p>
+    @if (reserva != null)
+    {
+        <p><strong>Período original:</strong> @reserva.FechaInicio.ToString("dd/MM/yyyy") al @reserva.FechaFinOriginal.ToString("dd/MM/yyyy")</p>
+        <p><strong>Monto por día:</strong> @reserva.MontoDia.ToString("C")</p>
+    }
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Finalizar" method="post">
+            <input asp-for="IdReserva" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="FechaFinalizacion" class="form-label">Fecha efectiva de finalización</label>
+                <input asp-for="FechaFinalizacion" type="date" class="form-control" />
+                <span asp-validation-for="FechaFinalizacion" class="text-danger"></span>
+            </div>
+
+            <button type="submit" name="accion" value="calcular" class="btn btn-primary">
+                Calcular multa
+            </button>
+
+            @if (Model.Calculada)
+            {
+                <input asp-for="MultaCalculada" type="hidden" />
+                <input asp-for="PorcentajeMulta" type="hidden" />
+                <input asp-for="DiasRestantes" type="hidden" />
+                <input asp-for="Calculada" type="hidden" />
+
+                <div class="alert alert-warning mt-3">
+                    <p><strong>Días restantes:</strong> @Model.DiasRestantes</p>
+                    <p><strong>Porcentaje de la multa:</strong> @Model.PorcentajeMulta%</p>
+                    <p class="mb-0"><strong>Multa a pagar:</strong> @Model.MultaCalculada.ToString("C")</p>
+                </div>
+
+                <p>
+                    Al confirmar se registra el pago de la multa y se finaliza la reserva.
+                    La reserva no puede finalizarse sin registrar este pago.
+                </p>
+
+                <button type="submit" name="accion" value="confirmar" class="btn btn-danger">
+                    Registrar pago y finalizar
+                </button>
+            }
+
+            <a asp-action="Details" asp-route-id="@Model.IdReserva" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
