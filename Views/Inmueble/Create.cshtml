@@ -51,7 +51,9 @@
 
     <div class="form-group">
         <label asp-for="CoordenadasInmuebles"></label>
-        <input asp-for="CoordenadasInmuebles" class="form-control" />
+        <input asp-for="CoordenadasInmuebles" class="form-control"
+               placeholder="Opcional. Ejemplo: -33.3017, -66.3378" />
+        <span asp-validation-for="CoordenadasInmuebles"></span>
     </div>
 
     <div class="form-group">

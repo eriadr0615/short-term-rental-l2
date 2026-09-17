@@ -40,7 +40,10 @@ namespace Inmobiliaria.Models
                     command.Parameters.AddWithValue("@idPropietario", inmueble.IdPropietario);
                     command.Parameters.AddWithValue("@direccion", inmueble.DireccionInmueble);
                     command.Parameters.AddWithValue("@idTipoInmueble", inmueble.IdTipoInmueble);
-                    command.Parameters.AddWithValue("@coordenadas", inmueble.CoordenadasInmuebles);
+                    command.Parameters.AddWithValue("@coordenadas",
+                        string.IsNullOrWhiteSpace(inmueble.CoordenadasInmuebles)
+                            ? DBNull.Value
+                            : inmueble.CoordenadasInmuebles.Trim());
                     command.Parameters.AddWithValue("@precioDiario", inmueble.PrecioDiario);
                     command.Parameters.AddWithValue("@porcentajeReserva", inmueble.PorcentajeReserva);
                     command.Parameters.AddWithValue("@disponible", inmueble.Disponible);
@@ -96,7 +99,10 @@ namespace Inmobiliaria.Models
                     command.Parameters.AddWithValue("@idPropietario", inmueble.IdPropietario);
                     command.Parameters.AddWithValue("@direccion", inmueble.DireccionInmueble);
                     command.Parameters.AddWithValue("@idTipoInmueble", inmueble.IdTipoInmueble);
-                    command.Parameters.AddWithValue("@coordenadas", inmueble.CoordenadasInmuebles);
+                    command.Parameters.AddWithValue("@coordenadas",
+                        string.IsNullOrWhiteSpace(inmueble.CoordenadasInmuebles)
+                            ? DBNull.Value
+                            : inmueble.CoordenadasInmuebles.Trim());
                     command.Parameters.AddWithValue("@precioDiario", inmueble.PrecioDiario);
                     command.Parameters.AddWithValue("@porcentajeReserva", inmueble.PorcentajeReserva);
                     command.Parameters.AddWithValue("@disponible", inmueble.Disponible);

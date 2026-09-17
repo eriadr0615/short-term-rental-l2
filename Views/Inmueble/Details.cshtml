@@ -57,7 +57,9 @@
 
                     <p>
                         <strong>Coordenadas:</strong>
-                        @Model.CoordenadasInmuebles
+                        @(string.IsNullOrWhiteSpace(Model.CoordenadasInmuebles)
+                            ? "No informadas"
+                            : Model.CoordenadasInmuebles)
                     </p>
                     <p>
                         <strong>Disponible:</strong>

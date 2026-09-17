@@ -245,6 +245,7 @@ namespace Inmobiliaria.Models
                               OR nombre LIKE @patron
                               OR apellido LIKE @patron
                               OR CONCAT(nombre, ' ', apellido) LIKE @patron
+                              OR CONCAT(apellido, ' ', nombre) LIKE @patron
                            ORDER BY apellido, nombre
                            LIMIT @cantidad";
 

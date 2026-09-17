@@ -16,8 +16,11 @@ namespace Inmobiliaria.Models
         [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un tipo de inmueble")]
         public int IdTipoInmueble { get; set; }
 
+        [Display(Name = "Coordenadas (grados decimales)")]
         [StringLength(100)]
-        public string CoordenadasInmuebles { get; set; } = "";
+        [RegularExpression(@"^-?(?:[0-8]?\d(?:\.\d+)?|90(?:\.0+)?),\s*-?(?:(?:1[0-7]\d|[1-9]?\d)(?:\.\d+)?|180(?:\.0+)?)$",
+            ErrorMessage = "Ingrese latitud y longitud en grados decimales. Ejemplo: -33.3017, -66.3378")]
+        public string? CoordenadasInmuebles { get; set; }
         //  importante! usar siempre decimal para precios y montos, no float!
 
         [Required(ErrorMessage = "Ingrese el precio por noche")]
