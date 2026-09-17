@@ -87,6 +87,246 @@ namespace Inmobiliaria.Models
         }
 
 
+        public IList<InformeReserva> ReservasPorFinalizar(
+            int dias,
+            int pagina,
+            int tamanoPagina,
+            out int totalRegistros)
+        {
+            IList<InformeReserva> lista =
+                new List<InformeReserva>();
+
+            totalRegistros = 0;
+
+            using (var connection =
+                new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string sqlCantidad = @"
+                    SELECT COUNT(*)
+                    FROM Reserva r
+                    WHERE COALESCE(
+                        r.fecha_finalizacion_anticipada,
+                        r.fecha_fin_original
+                    ) BETWEEN CURDATE()
+                    AND DATE_ADD(CURDATE(), INTERVAL @dias DAY);";
+
+                using (var commandCantidad =
+                    new MySqlCommand(sqlCantidad, connection))
+                {
+                    commandCantidad.Parameters.AddWithValue(
+                        "@dias", dias);
+
+                    totalRegistros =
+                        Convert.ToInt32(
+                            commandCantidad.ExecuteScalar());
+                }
+
+                int offset =
+                    (pagina - 1) * tamanoPagina;
+                string sql = @"
+                    SELECT
+                        r.id_reserva,
+                        r.fecha_inicio,
+                        r.fecha_fin_original,
+                        r.fecha_finalizacion_anticipada,
+                        r.monto_dia,
+                        iq.nombre AS nombre_inquilino,
+                        iq.apellido AS apellido_inquilino,
+                        i.direccion_inmueble
+                    FROM Reserva r
+
+                    INNER JOIN Inquilino iq
+                        ON r.id_inquilino = iq.id_inquilino
+
+                    INNER JOIN Inmueble i
+                        ON r.id_inmueble = i.id_inmueble
+
+                    WHERE COALESCE(
+                        r.fecha_finalizacion_anticipada,
+                        r.fecha_fin_original
+                    ) BETWEEN CURDATE()
+                    AND DATE_ADD(CURDATE(), INTERVAL @dias DAY)
+
+                    ORDER BY COALESCE(
+                        r.fecha_finalizacion_anticipada,
+                        r.fecha_fin_original
+                    )
+                    LIMIT @limite OFFSET @offset;";
+
+                using (var command =
+                    new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue(
+                        "@dias", dias);
+
+                    command.Parameters.AddWithValue(
+                        "@limite", tamanoPagina);
+                    command.Parameters.AddWithValue(
+                        "@offset", offset);
+                    using (var reader =
+                        command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            InformeReserva informe =
+                                new InformeReserva
+                                {
+                                    IdReserva =
+                                        Convert.ToInt32(
+                                            reader["id_reserva"]),
+
+                                    Inquilino =
+                                        $"{reader["nombre_inquilino"]} " +
+                                        $"{reader["apellido_inquilino"]}",
+
+                                    Inmueble =
+                                        reader["direccion_inmueble"]
+                                        .ToString() ?? "",
+
+                                    FechaInicio =
+                                        Convert.ToDateTime(
+                                            reader["fecha_inicio"]),
+
+                                    FechaFin =
+                                        reader["fecha_finalizacion_anticipada"]
+                                            != DBNull.Value
+                                            ? Convert.ToDateTime(
+                                                reader["fecha_finalizacion_anticipada"])
+                                            : Convert.ToDateTime(
+                                                reader["fecha_fin_original"]),
+                                    MontoDia =
+                                        Convert.ToDecimal(
+                                            reader["monto_dia"])
+                                };
+                            lista.Add(informe);
+                        }
+                    }
+                }
+            }
+
+            return lista;
+        }
+
+
+
+
+        public IList<InformeReserva> ReservasVigentes(
+            int pagina,
+            int tamanoPagina,
+            out int totalRegistros)
+        {
+            IList<InformeReserva> lista =
+                new List<InformeReserva>();
+
+            totalRegistros = 0;
+
+            using (var connection =
+                new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                string sqlCantidad = @"
+            SELECT COUNT(*)
+            FROM Reserva r
+            WHERE r.fecha_inicio <= CURDATE()
+            AND COALESCE(
+                r.fecha_finalizacion_anticipada,
+                r.fecha_fin_original
+            ) >= CURDATE();";
+
+                using (var commandCantidad =
+                    new MySqlCommand(sqlCantidad, connection))
+                {
+                    totalRegistros =
+                        Convert.ToInt32(
+                            commandCantidad.ExecuteScalar());
+                }
+                int offset =
+                    (pagina - 1) * tamanoPagina;
+
+                string sql = @"
+            SELECT
+                r.id_reserva,
+                r.fecha_inicio,
+                r.fecha_fin_original,
+                r.fecha_finalizacion_anticipada,
+                r.monto_dia,
+                iq.nombre AS nombre_inquilino,
+                iq.apellido AS apellido_inquilino,
+                i.direccion_inmueble
+            FROM Reserva r
+
+            INNER JOIN Inquilino iq
+                ON r.id_inquilino = iq.id_inquilino
+
+            INNER JOIN Inmueble i
+                ON r.id_inmueble = i.id_inmueble
+
+            WHERE r.fecha_inicio <= CURDATE()
+
+            AND COALESCE(
+                r.fecha_finalizacion_anticipada,
+                r.fecha_fin_original
+            ) >= CURDATE()
+
+            ORDER BY r.fecha_fin_original
+
+            LIMIT @limite OFFSET @offset;";
+
+                using (var command =
+                    new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue(
+                        "@limite", tamanoPagina);
+                    command.Parameters.AddWithValue(
+                        "@offset", offset);
+                    using (var reader =
+                        command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            InformeReserva informe =
+                                new InformeReserva
+                                {
+                                    IdReserva =
+                                        Convert.ToInt32(
+                                            reader["id_reserva"]),
+
+                                    Inquilino =
+                                        $"{reader["nombre_inquilino"]} " +
+                                        $"{reader["apellido_inquilino"]}",
+
+                                    Inmueble =
+                                        reader["direccion_inmueble"]
+                                        .ToString() ?? "",
+
+                                    FechaInicio =
+                                        Convert.ToDateTime(
+                                            reader["fecha_inicio"]),
+
+                                    FechaFin =
+                                        reader["fecha_finalizacion_anticipada"]
+                                            != DBNull.Value
+                                            ? Convert.ToDateTime(
+                                                reader["fecha_finalizacion_anticipada"])
+                                            : Convert.ToDateTime(
+                                                reader["fecha_fin_original"]),
+
+                                    MontoDia =
+                                        Convert.ToDecimal(
+                                            reader["monto_dia"])
+                                };
+
+                            lista.Add(informe);
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
+
+
         public IList<InformeInmueble> InmueblesMasReservados(
             int pagina,
             int tamanoPagina,

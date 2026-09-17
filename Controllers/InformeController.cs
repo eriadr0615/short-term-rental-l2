@@ -112,6 +112,93 @@ namespace Inmobiliaria.Controllers
         }
 
 
+        public IActionResult Reserva(int pagina = 1)
+        {
+            try
+            {
+                const int tamanoPagina = 10;
+                pagina = Math.Max(pagina, 1);
+                var lista =
+                    repositorio.ReservasVigentes(
+                        pagina,
+                        tamanoPagina,
+                        out int totalRegistros);
+                ViewBag.Pagina = pagina;
+                ViewBag.TotalPaginas =
+                    (int)Math.Ceiling(
+                        totalRegistros /
+                        (double)tamanoPagina);
+                return View(lista);
+            }
+            catch (MySqlException ex)
+            {
+                ViewBag.Error =
+                    "ups, hubo un problema al consultar la base de datos.";
+                Console.WriteLine(ex.Message);
+                return View(
+                    new List<InformeReserva>());
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error =
+                    "ups, hubo un error al generar el informe.";
+                Console.WriteLine(ex.Message);
+                return View(
+                    new List<InformeReserva>());
+            }
+        }
+
+        public IActionResult FinReserva(int? dias, int pagina = 1)
+        {
+            try
+            {
+                IList<InformeReserva> lista =
+                    new List<InformeReserva>();
+
+                if (dias.HasValue && dias.Value > 0)
+                {
+                    const int tamanoPagina = 10;
+                    pagina = Math.Max(pagina, 1);
+                    lista =
+                        repositorio.ReservasPorFinalizar(
+                            dias.Value,
+                            pagina,
+                            tamanoPagina,
+                            out int totalRegistros);
+                    ViewBag.Pagina = pagina;
+
+                    ViewBag.TotalPaginas =
+                        (int)Math.Ceiling(
+                            totalRegistros /
+                            (double)tamanoPagina);
+                    ViewBag.BusquedaRealizada = true;
+                }
+
+                ViewBag.Dias = dias;
+                return View(lista);
+            }
+            catch (MySqlException ex)
+            {
+                ViewBag.Error =
+                    "Hubo un problema al consultar la base de datos";
+                Console.WriteLine(ex.Message);
+                return View(
+                    new List<InformeReserva>());
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error =
+                    "Hubo un error al generar el informe";
+                Console.WriteLine(ex.Message);
+                return View(
+                    new List<InformeReserva>());
+            }
+        }
+
+
+
+
+
         public IActionResult MasReservado(int pagina = 1)
         {
             try
@@ -122,20 +209,19 @@ namespace Inmobiliaria.Controllers
                     pagina, tamanoPagina, out int totalRegistros);
                 ViewBag.Pagina = pagina;
                 ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)tamanoPagina);
-
                 return View(lista);
             }
             catch (MySqlException ex)
             {
                 ViewBag.Error =
-                    "Hubo un problema al consultar la base de datos";
+                    "ups, hubo un problema al consultar la base de datos";
                 Console.WriteLine(ex.Message);
                 return View(new List<InformeInmueble>());
             }
             catch (Exception ex)
             {
                 ViewBag.Error =
-                    "Hubo un error al generar el informe";
+                    "ups, hubo un error al generar el informe";
                 Console.WriteLine(ex.Message);
                 return View(new List<InformeInmueble>());
             }
