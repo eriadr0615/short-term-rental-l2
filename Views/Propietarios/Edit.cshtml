@@ -3,6 +3,7 @@
 <h1>Editar propietario</h1>
 
 <form asp-action="Edit" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <input asp-for="IdPropietario" type="hidden" />
 

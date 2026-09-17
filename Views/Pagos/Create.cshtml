@@ -51,7 +51,7 @@
 
             <div class="mb-3">
                 <label asp-for="Monto" class="form-label"></label>
-                <input asp-for="Monto" class="form-control" />
+                <input asp-for="Monto" type="number" step="0.01" class="form-control" />
                 <span asp-validation-for="Monto" class="text-danger"></span>
             </div>
 
@@ -68,6 +68,6 @@
         configurarBusquedaAjax(
             "#buscar-reserva",
             "#reserva",
-            "@Url.Action("Buscar", "Reservas")");
+            "@Url.Action("Buscar", "Reservas")", null, 1);
     </script>
 }

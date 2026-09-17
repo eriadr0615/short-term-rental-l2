@@ -42,11 +42,11 @@
 
             <div class="mb-3">
                 <label asp-for="MontoDia" class="form-label">Nuevo monto por día</label>
-                <input asp-for="MontoDia" class="form-control" />
+                <input asp-for="MontoDia" type="number" step="0.01" min="0.01" class="form-control" />
                 <span asp-validation-for="MontoDia" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-primary">Crear renovación</button>
+            <button type="submit" class="btn btn-primary">Continuar al pago inicial</button>
             <a asp-action="Details" asp-route-id="@Model.IdReservaOrigen" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>

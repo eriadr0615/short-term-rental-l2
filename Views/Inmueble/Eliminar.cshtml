@@ -2,6 +2,8 @@
 
 <h1>Eliminar un inmueble</h1>
 
+<div asp-validation-summary="All" class="text-danger mb-3"></div>
+
 <p> Esta seguro que desea eliminar este inmueble?</p>
 
 <p><strong>@Model.DireccionInmueble</strong></p>
@@ -13,6 +15,7 @@
     <button type="submit" class="btn btn-danger">
         Eliminar
     </button>
+
     <a asp-action="Index" class="btn btn-secondary">
         Cancelar
     </a>

@@ -1,6 +1,7 @@
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MySqlConnector;
 
 namespace Inmobiliaria.Controllers
 {
@@ -13,9 +14,6 @@ namespace Inmobiliaria.Controllers
         {
             this.repositorio = repositorio;
         }
-
-
-
 
         public IActionResult Index(int pagina = 1, string? buscar = null)
         {
@@ -46,8 +44,6 @@ namespace Inmobiliaria.Controllers
             return Json(resultado);
         }
 
-
-
         public IActionResult Details(int id)
         {
             var inquilino = repositorio.ObtenerPorId(id);
@@ -58,9 +54,6 @@ namespace Inmobiliaria.Controllers
             }
             return View("~/Views/Inquilino/Details.cshtml", inquilino);
         }
-
-
-
 
         public IActionResult Create()
         {
@@ -75,8 +68,21 @@ namespace Inmobiliaria.Controllers
             {
                 return View("~/Views/Inquilino/Create.cshtml", inquilino);
             }
-            repositorio.Alta(inquilino);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                inquilino.Dni = inquilino.Dni.Trim();
+                repositorio.Alta(inquilino);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (MySqlException ex) when (ex.Number == 1062)
+            {
+                ModelState.AddModelError(nameof(inquilino.Dni), "Ya existe un inquilino con ese DNI");
+            }
+            catch (MySqlException)
+            {
+                ModelState.AddModelError("", "No se pudo guardar el inquilino. Intentá nuevamente.");
+            }
+            return View("~/Views/Inquilino/Create.cshtml", inquilino);
         }
 
         public IActionResult Edit(int id)
@@ -98,12 +104,27 @@ namespace Inmobiliaria.Controllers
             {
                 return BadRequest();
             }
+            if (repositorio.ObtenerPorId(id) == null)
+                return NotFound();
             if (!ModelState.IsValid)
             {
                 return View("~/Views/Inquilino/Edit.cshtml", inquilino);
             }
-            repositorio.Modificacion(inquilino);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                inquilino.Dni = inquilino.Dni.Trim();
+                repositorio.Modificacion(inquilino);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (MySqlException ex) when (ex.Number == 1062)
+            {
+                ModelState.AddModelError(nameof(inquilino.Dni), "Ya existe un inquilino con ese DNI");
+            }
+            catch (MySqlException)
+            {
+                ModelState.AddModelError("", "No se pudo modificar el inquilino. Intentá nuevamente.");
+            }
+            return View("~/Views/Inquilino/Edit.cshtml", inquilino);
         }
 
         [Authorize(Policy = Usuario.RolAdministrador)]
@@ -124,8 +145,22 @@ namespace Inmobiliaria.Controllers
         [Authorize(Policy = Usuario.RolAdministrador)]
         public IActionResult DeleteConfirmed(int id)
         {
-            repositorio.Baja(id);
-            return RedirectToAction(nameof(Index));
+            var inquilino = repositorio.ObtenerPorId(id);
+            if (inquilino == null) return NotFound();
+            try
+            {
+                repositorio.Baja(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (MySqlException ex) when (ex.Number == 1451)
+            {
+                ModelState.AddModelError("", "No se puede eliminar este inquilino porque tiene reservas asociadas");
+            }
+            catch (MySqlException)
+            {
+                ModelState.AddModelError("", "No se pudo eliminar el inquilino. Intentá nuevamente.");
+            }
+            return View("~/Views/Inquilino/Delete.cshtml", inquilino);
         }
     }
 }

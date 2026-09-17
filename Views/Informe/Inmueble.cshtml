@@ -6,6 +6,7 @@
 
 <div class="container mt-4">
     <h2 class="mb-4"> Inmuebles y propietarios </h2>
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <form method="get"
           asp-controller="Informe" asp-action="Inmueble"
@@ -18,13 +19,13 @@
 
             <select name="disponible"
                     class="form-select">
-                <option value="">
+                <option value="" selected="@(ViewBag.Disponible == null ? "selected" : null)">
                     Todos
                 </option>
-                <option value="true">
+                <option value="true" selected="@(ViewBag.Disponible == true ? "selected" : null)">
                     Disponibles
                 </option>
-                <option value="false">
+                <option value="false" selected="@(ViewBag.Disponible == false ? "selected" : null)">
                     No disponibles
                 </option>
             </select>

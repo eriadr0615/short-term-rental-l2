@@ -1,0 +1,15 @@
+@{ ViewData["Title"] = "Pagos de una reserva"; }
+
+<h1>Pagos de una reserva</h1>
+<p>Ingresá el número de reserva para ver sus pagos. Desde ese listado también podés registrar un nuevo pago.</p>
+<div asp-validation-summary="All" class="text-danger mb-3"></div>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <label for="idReserva" class="form-label">Número de reserva</label>
+        <input id="idReserva" name="idReserva" value="@ViewBag.IdReserva" type="number" min="1" step="1" class="form-control" required />
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Ver pagos</button>
+    </div>
+</form>
+<a asp-action="Index" class="btn btn-secondary">Volver a informes</a>

@@ -12,6 +12,13 @@ namespace Inmobiliaria.Models
         public int Alta(Pago pago)
         {
             using var connection = new MySqlConnection(connectionString);
+            connection.Open();
+            return Insertar(pago, connection, null);
+        }
+
+        // Permite compartir la conexión y la transacción con una reserva.
+        internal static int Insertar(Pago pago, MySqlConnection connection, MySqlTransaction? transaction)
+        {
             string sql = @"INSERT INTO Pago
                            (id_reserva, concepto, fecha_pago, monto, estado,
                             id_usuario_creacion, id_usuario_anulacion)
@@ -20,7 +27,7 @@ namespace Inmobiliaria.Models
                             @idUsuarioCreacion, NULL);
                            SELECT LAST_INSERT_ID();";
 
-            using var command = new MySqlCommand(sql, connection);
+            using var command = new MySqlCommand(sql, connection, transaction);
             command.Parameters.AddWithValue("@idReserva", pago.IdReserva);
             command.Parameters.AddWithValue("@concepto", pago.Concepto);
             command.Parameters.AddWithValue("@fechaPago", pago.FechaPago);
@@ -28,7 +35,6 @@ namespace Inmobiliaria.Models
             command.Parameters.AddWithValue("@estado", Pago.EstadoActivo);
             command.Parameters.AddWithValue("@idUsuarioCreacion", pago.IdUsuarioCreacion);
 
-            connection.Open();
             pago.IdPago = Convert.ToInt32(command.ExecuteScalar());
             return pago.IdPago;
         }

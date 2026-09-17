@@ -1,30 +1,65 @@
 <script>
-    function configurarBusquedaAjax(inputId, selectId, url, parametrosExtra) {
+    function configurarBusquedaAjax(inputId, selectId, url, parametrosExtra, minimoCaracteres = 2) {
         let espera;
+        let solicitud;
+        let version = 0;
         const entrada = $(inputId);
         const selector = $(selectId);
+        const estado = $("<small>").addClass("d-block text-muted").attr("aria-live", "polite");
+        selector.after(estado);
 
-        entrada.on("input", function () {
+        function limpiarOpciones(conservarSeleccion) {
+            const elegida = conservarSeleccion ? selector.find("option:selected").first() : null;
+            const valor = elegida ? elegida.val() : "";
+            selector.empty().append(new Option("Seleccione una opción", ""));
+            if (valor && valor !== "0") {
+                selector.append(new Option(elegida.text(), valor, false, true));
+            }
+        }
+
+        function buscar(conservarSeleccion = true) {
             clearTimeout(espera);
+            const versionActual = ++version;
+            if (solicitud) {
+                solicitud.abort();
+                solicitud = null;
+            }
+            limpiarOpciones(conservarSeleccion);
+
             const termino = entrada.val().trim();
-            if (termino.length < 2) {
+            if (termino.length < minimoCaracteres) {
+                estado.text("Escribí al menos " + minimoCaracteres + " caracteres para buscar.");
                 return;
             }
 
+            estado.text("Buscando...");
             espera = setTimeout(function () {
                 const parametros = { q: termino };
                 if (parametrosExtra) {
                     Object.assign(parametros, parametrosExtra());
                 }
 
-                $.get(url, parametros, function (datos) {
-                    selector.empty();
-                    selector.append(new Option("Seleccione una opción", ""));
+                solicitud = $.get(url, parametros, function (datos) {
+                    // Una respuesta anterior no debe reemplazar los resultados actuales.
+                    if (versionActual !== version) return;
+                    limpiarOpciones(true);
+                    const valorSeleccionado = selector.val();
                     datos.forEach(function (item) {
-                        selector.append(new Option(item.texto, item.id));
+                        if (String(item.id) !== valorSeleccionado) {
+                            selector.append(new Option(item.texto, item.id));
+                        }
                     });
+                    estado.text(datos.length === 0
+                        ? "Sin coincidencias para esta búsqueda."
+                        : (datos.length === 10 ? "Se muestran hasta 10 resultados. Refiná la búsqueda si hace falta." : ""));
+                }).fail(function (_, motivo) {
+                    if (versionActual !== version || motivo === "abort") return;
+                    estado.text("No se pudo completar la búsqueda. Volvé a intentarlo.");
                 });
             }, 300);
-        });
+        }
+
+        entrada.on("input", function () { buscar(); });
+        return buscar;
     }
 </script>

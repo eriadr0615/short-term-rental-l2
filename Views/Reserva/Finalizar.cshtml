@@ -42,6 +42,7 @@
                 <input asp-for="PorcentajeMulta" type="hidden" />
                 <input asp-for="DiasRestantes" type="hidden" />
                 <input asp-for="Calculada" type="hidden" />
+                <input asp-for="FechaCalculada" type="hidden" />
 
                 <div class="alert alert-warning mt-3">
                     <p><strong>Días restantes:</strong> @Model.DiasRestantes</p>
@@ -66,4 +67,11 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Cambiar la fecha obliga a mostrar la nueva multa antes de cobrarla.
+        document.getElementById("FechaFinalizacion").addEventListener("input", function () {
+            const confirmar = document.querySelector('button[value="confirmar"]');
+            if (confirmar) confirmar.disabled = true;
+        });
+    </script>
 }

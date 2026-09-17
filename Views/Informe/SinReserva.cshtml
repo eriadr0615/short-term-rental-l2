@@ -12,6 +12,7 @@
     <p class="text-muted">
         Buscar inmuebles sin reservas recientes
     </p>
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     @if (ViewBag.Error != null)
     {
@@ -86,9 +87,10 @@
     else if (ViewBag.BusquedaRealizada == true)
     {
         <div class="alert alert-info">
-            No hay inmuebles desocupados en las fechas seleccionadas
+            No se encontraron inmuebles sin reservas en ese período
         </div>
     }
+    <partial name="_Paginacion" />
     <a asp-controller="Informe" asp-action="Index" class="btn btn-secondary">
         Volver
     </a>

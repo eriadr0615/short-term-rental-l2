@@ -1,0 +1,24 @@
+@model IList<Inmobiliaria.Models.InformeInmueble>
+@{ ViewData["Title"] = "Inmuebles libres entre fechas"; }
+
+<h1>Inmuebles libres entre fechas</h1>
+<p>Se muestran inmuebles ofrecidos para alquilar y sin reservas superpuestas. La fecha de salida puede coincidir con la entrada de otra reserva.</p>
+<div asp-validation-summary="All" class="text-danger mb-3"></div>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <label for="fechaInicio" class="form-label">Fecha de inicio</label>
+        <input id="fechaInicio" name="fechaInicio" value="@ViewBag.FechaInicio" type="date" class="form-control" required />
+    </div>
+    <div class="col-md-4">
+        <label for="fechaFin" class="form-label">Fecha de salida</label>
+        <input id="fechaFin" name="fechaFin" value="@ViewBag.FechaFin" type="date" class="form-control" required />
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Consultar</button>
+    </div>
+</form>
+@if (ViewBag.Consultado == true)
+{
+    <partial name="_TablaInmuebles" model="Model" />
+}
+<a asp-action="Index" class="btn btn-secondary">Volver a informes</a>

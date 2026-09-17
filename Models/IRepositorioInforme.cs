@@ -8,30 +8,20 @@ namespace Inmobiliaria.Models
             int pagina,
             int tamanoPagina,
             out int totalRegistros);
-        IList<InformeInmueble> InmueblesPorPropietario(string dni);
-
-        IList<InformeInmueble> InmueblesSinReserva(int dias);
-
-
-        IList<InformeReserva> ReservasVigentes(
-            int pagina,
-            int tamanoPagina,
-            out int totalRegistros);
-
-
+        IList<InformeInmueble> InmueblesPorPropietario(
+            string dni, int pagina, int tamanoPagina, out int totalRegistros);
         IList<InformeInmueble> InmueblesMasReservados(
             int pagina,
             int tamanoPagina,
             out int totalRegistros);
-
-
-
+        IList<InformeInmueble> InmueblesSinReserva(
+            int dias, int pagina, int tamanoPagina, out int totalRegistros);
+        IList<InformeReserva> ReservasVigentes(
+            int pagina, int tamanoPagina, out int totalRegistros);
         IList<InformeReserva> ReservasPorFinalizar(
-            int dias,
-            int pagina,
-            int tamanoPagina,
-            out int totalRegistros);
-
-            
+            int dias, int pagina, int tamanoPagina, out int totalRegistros);
+        IList<InformeInmueble> InmueblesLibres(
+            DateTime fechaInicio, DateTime fechaFin,
+            int pagina, int tamanoPagina, out int totalRegistros);
     }
 }

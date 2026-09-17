@@ -68,7 +68,10 @@
 </div>
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.IdReserva" class="btn btn-primary">Editar</a>
+    @if (!Model.FechaFinalizacionAnticipada.HasValue)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.IdReserva" class="btn btn-primary">Editar</a>
+    }
     <a asp-controller="Pagos" asp-action="Index" asp-route-idReserva="@Model.IdReserva"
        class="btn btn-success">Ver pagos</a>
     @if (!Model.FechaFinalizacionAnticipada.HasValue)

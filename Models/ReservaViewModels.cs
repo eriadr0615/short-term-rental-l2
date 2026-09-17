@@ -2,6 +2,22 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Inmobiliaria.Models
 {
+    // Datos del formulario de confirmación; no agrega columnas a la base de datos.
+    public class ConfirmarReservaView
+    {
+        public Reserva Reserva { get; set; } = new Reserva();
+
+        [Required(ErrorMessage = "El concepto del pago es obligatorio")]
+        [StringLength(150)]
+        public string Concepto { get; set; } = "Seña inicial";
+
+        [Range(0, 9999999999.99, ErrorMessage = "El importe no puede ser negativo ni superar el límite permitido")]
+        public decimal MontoPago { get; set; }
+
+        public decimal PorcentajeReserva { get; set; }
+        public decimal MontoMinimo { get; set; }
+    }
+
     public class FinalizarReservaView
     {
         public int IdReserva { get; set; }
@@ -14,6 +30,7 @@ namespace Inmobiliaria.Models
         public int PorcentajeMulta { get; set; }
         public int DiasRestantes { get; set; }
         public bool Calculada { get; set; }
+        public DateTime? FechaCalculada { get; set; }
     }
 
     public class RenovarReservaView

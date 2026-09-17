@@ -1,6 +1,7 @@
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MySqlConnector;
 
 namespace Inmobiliaria.Controllers
 {
@@ -39,8 +40,20 @@ namespace Inmobiliaria.Controllers
         {
             if (ModelState.IsValid)
             {
-                repositorio.Alta(tipo);
-                return RedirectToAction("Index");
+                try
+                {
+                    tipo.NombreTipo = tipo.NombreTipo.Trim();
+                    repositorio.Alta(tipo);
+                    return RedirectToAction("Index");
+                }
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    ModelState.AddModelError(nameof(tipo.NombreTipo), "Ya existe un tipo de inmueble con ese nombre");
+                }
+                catch (MySqlException)
+                {
+                    ModelState.AddModelError("", "No se pudo guardar el tipo de inmueble. Intentá nuevamente.");
+                }
             }
             return View(tipo);
         }
@@ -60,10 +73,24 @@ namespace Inmobiliaria.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(TipoInmueble tipo)
         {
+            if (repositorio.ObtenerPorId(tipo.IdTipoInmueble) == null)
+                return NotFound();
             if (ModelState.IsValid)
             {
-                repositorio.Modificacion(tipo);
-                return RedirectToAction("Index");
+                try
+                {
+                    tipo.NombreTipo = tipo.NombreTipo.Trim();
+                    repositorio.Modificacion(tipo);
+                    return RedirectToAction("Index");
+                }
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    ModelState.AddModelError(nameof(tipo.NombreTipo), "Ya existe un tipo de inmueble con ese nombre");
+                }
+                catch (MySqlException)
+                {
+                    ModelState.AddModelError("", "No se pudo modificar el tipo de inmueble. Intentá nuevamente.");
+                }
             }
             return View(tipo);
         }
@@ -83,8 +110,22 @@ namespace Inmobiliaria.Controllers
         [Authorize(Policy = Usuario.RolAdministrador)]
         public IActionResult EliminarConfirmado(int id)
         {
-            repositorio.Baja(id);
-            return RedirectToAction("Index");
+            var tipo = repositorio.ObtenerPorId(id);
+            if (tipo == null) return NotFound();
+            try
+            {
+                repositorio.Baja(id);
+                return RedirectToAction("Index");
+            }
+            catch (MySqlException ex) when (ex.Number == 1451)
+            {
+                ModelState.AddModelError("", "No se puede eliminar este tipo porque tiene inmuebles asociados");
+            }
+            catch (MySqlException)
+            {
+                ModelState.AddModelError("", "No se pudo eliminar el tipo de inmueble. Intentá nuevamente.");
+            }
+            return View("Eliminar", tipo);
         }
 
         public IActionResult Details(int id)

@@ -51,8 +51,12 @@
             <td>@(item.FechaFinalizacionAnticipada?.ToString("dd/MM/yyyy") ?? "-")</td>
             <td>@item.MontoDia.ToString("C")</td>
             <td class="text-nowrap">
-                <a asp-action="Details" asp-route-id="@item.IdReserva">Detalle</a> |
-                <a asp-action="Edit" asp-route-id="@item.IdReserva">Editar</a>
+                <a asp-action="Details" asp-route-id="@item.IdReserva">Detalle</a>
+                @if (!item.FechaFinalizacionAnticipada.HasValue)
+                {
+                    <span> | </span>
+                    <a asp-action="Edit" asp-route-id="@item.IdReserva">Editar</a>
+                }
                 @if (User.IsInRole(Usuario.RolAdministrador))
                 {
                     <span> | </span>

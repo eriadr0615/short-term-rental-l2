@@ -61,7 +61,7 @@
 
             <div class="mb-3">
                 <label asp-for="MontoDia" class="form-label">Monto por día</label>
-                <input asp-for="MontoDia" class="form-control" />
+                <input asp-for="MontoDia" type="number" step="0.01" min="0.01" class="form-control" />
                 <span asp-validation-for="MontoDia" class="text-danger"></span>
             </div>
 
@@ -82,7 +82,7 @@
             "#inquilino",
             "@Url.Action("Buscar", "Inquilinos")");
 
-        configurarBusquedaAjax(
+        const buscarInmueble = configurarBusquedaAjax(
             "#buscar-inmueble",
             "#inmueble",
             "@Url.Action("Buscar", "Inmueble")",
@@ -93,5 +93,10 @@
                     idReservaExcluir: @Model.IdReserva
                 };
             });
+        $("#FechaInicio, #FechaFinOriginal").on("change", function () {
+            // Una reserva existente puede conservar su inmueble aunque ya no se ofrezca.
+            // El servidor vuelve a comprobar las fechas al guardar.
+            buscarInmueble();
+        });
     </script>
 }

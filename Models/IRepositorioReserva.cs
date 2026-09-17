@@ -8,7 +8,9 @@ namespace Inmobiliaria.Models
             DateTime fechaFin,
             int? idReservaExcluir);
 
-        int Finalizar(int idReserva, DateTime fechaFinalizacion, int idUsuarioFinalizacion);
+        int AltaConPago(Reserva reserva, Pago? pagoInicial);
+
+        int FinalizarConPago(Reserva reserva, DateTime fechaFinalizacion, Pago pagoMulta);
 
         IList<Reserva> ObtenerLista(
             int pagina,

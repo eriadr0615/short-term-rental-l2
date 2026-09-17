@@ -11,54 +11,62 @@ namespace Inmobiliaria.Models
 
         public int Alta(Reserva reserva)
         {
-            int res = -1;
+            return AltaConPago(reserva, null);
+        }
 
-            using (var connection = new MySqlConnection(connectionString))
+        public int AltaConPago(Reserva reserva, Pago? pagoInicial)
+        {
+            using var connection = new MySqlConnection(connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+            try
             {
+                Inmueble inmueble = BloquearInmueble(reserva.IdInmueble, connection, transaction);
+                ValidarDatos(reserva);
+                if (!inmueble.Disponible)
+                    throw new InvalidOperationException("El inmueble está suspendido y no admite nuevas reservas");
+                if (inmueble.PorcentajeReserva < 0 || inmueble.PorcentajeReserva > 100)
+                    throw new InvalidOperationException("El porcentaje de reserva del inmueble debe estar entre 0 y 100");
+                ValidarOrigen(reserva, connection, transaction);
+                if (ExisteSuperposicion(reserva.IdInmueble, reserva.FechaInicio,
+                    reserva.FechaFinOriginal, null, connection, transaction))
+                    throw new InvalidOperationException("El inmueble ya tiene una reserva en ese período");
+
+                int dias = (reserva.FechaFinOriginal.Date - reserva.FechaInicio.Date).Days;
+                decimal minimo = Math.Round(dias * reserva.MontoDia * inmueble.PorcentajeReserva / 100m, 2);
+                if ((pagoInicial?.Monto ?? 0) < minimo)
+                    throw new InvalidOperationException($"La seña requerida es de al menos {minimo:C}. Revisá el importe antes de confirmar.");
+
                 string sql = @"INSERT INTO Reserva
-                    (id_inquilino,
-                     id_inmueble,
-                     fecha_inicio,
-                     fecha_fin_original,
-                     monto_dia,
-                     fecha_finalizacion_anticipada,
-                     id_usuario_creacion,
-                     id_usuario_finalizacion,
-                     id_reserva_origen)
-                    VALUES
-                    (@idInquilino,
-                     @idInmueble,
-                     @fechaInicio,
-                     @fechaFinOriginal,
-                     @montoDia,
-                     @fechaFinalizacionAnticipada,
-                     @idUsuarioCreacion,
-                     @idUsuarioFinalizacion,
-                     @idReservaOrigen);
-
+                    (id_inquilino, id_inmueble, fecha_inicio, fecha_fin_original,
+                     monto_dia, id_usuario_creacion, id_reserva_origen)
+                    VALUES (@idInquilino, @idInmueble, @inicio, @fin, @monto, @usuario, @origen);
                     SELECT LAST_INSERT_ID();";
-
-                using (var command = new MySqlCommand(sql, connection))
+                using var command = new MySqlCommand(sql, connection, transaction);
+                command.Parameters.AddWithValue("@idInquilino", reserva.IdInquilino);
+                command.Parameters.AddWithValue("@idInmueble", reserva.IdInmueble);
+                command.Parameters.AddWithValue("@inicio", reserva.FechaInicio.Date);
+                command.Parameters.AddWithValue("@fin", reserva.FechaFinOriginal.Date);
+                command.Parameters.AddWithValue("@monto", reserva.MontoDia);
+                command.Parameters.AddWithValue("@usuario", reserva.IdUsuarioCreacion);
+                command.Parameters.AddWithValue("@origen", (object?)reserva.IdReservaOrigen ?? DBNull.Value);
+                int id = Convert.ToInt32(command.ExecuteScalar());
+                if (pagoInicial != null)
                 {
-                    command.Parameters.AddWithValue("@idInquilino", reserva.IdInquilino);
-                    command.Parameters.AddWithValue("@idInmueble", reserva.IdInmueble);
-                    command.Parameters.AddWithValue("@fechaInicio", reserva.FechaInicio);
-                    command.Parameters.AddWithValue("@fechaFinOriginal", reserva.FechaFinOriginal);
-                    command.Parameters.AddWithValue("@montoDia", reserva.MontoDia);
-                    command.Parameters.AddWithValue("@fechaFinalizacionAnticipada", (object?)reserva.FechaFinalizacionAnticipada ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@idUsuarioCreacion", (object?)reserva.IdUsuarioCreacion ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@idUsuarioFinalizacion", (object?)reserva.IdUsuarioFinalizacion ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@idReservaOrigen", (object?)reserva.IdReservaOrigen ?? DBNull.Value);
-
-                    connection.Open();
-
-                    res = Convert.ToInt32(command.ExecuteScalar());
-
-                    reserva.IdReserva = res;
+                    pagoInicial.IdReserva = id;
+                    RepositorioPago.Insertar(pagoInicial, connection, transaction);
                 }
-            }
 
-            return res;
+                // Reserva y pago se confirman juntos; si algo falla, se deshacen ambos.
+                transaction.Commit();
+                reserva.IdReserva = id;
+                return id;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
         public int Baja(int id)
@@ -85,42 +93,61 @@ namespace Inmobiliaria.Models
 
         public int Modificacion(Reserva reserva)
         {
-            int res = -1;
-
-            using (var connection = new MySqlConnection(connectionString))
+            using var connection = new MySqlConnection(connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+            try
             {
+                Inmueble inmueble = BloquearInmueble(reserva.IdInmueble, connection, transaction);
+                ValidarDatos(reserva);
+                using (var anterior = new MySqlCommand(
+                    "SELECT id_inmueble, fecha_finalizacion_anticipada FROM Reserva WHERE id_reserva = @id FOR UPDATE",
+                    connection, transaction))
+                {
+                    anterior.Parameters.AddWithValue("@id", reserva.IdReserva);
+                    using var reader = anterior.ExecuteReader();
+                    if (!reader.Read() || reader["fecha_finalizacion_anticipada"] != DBNull.Value)
+                    {
+                        reader.Close();
+                        transaction.Rollback();
+                        return 0;
+                    }
+                    // Suspender una oferta no invalida sus reservas existentes.
+                    if (!inmueble.Disponible && Convert.ToInt32(reader["id_inmueble"]) != reserva.IdInmueble)
+                        throw new InvalidOperationException("El nuevo inmueble está suspendido");
+                }
+                ValidarOrigen(reserva, connection, transaction);
+                if (ExisteSuperposicion(reserva.IdInmueble, reserva.FechaInicio,
+                    reserva.FechaFinOriginal, reserva.IdReserva, connection, transaction))
+                    throw new InvalidOperationException("El inmueble ya tiene una reserva en ese período");
+
                 string sql = @"UPDATE Reserva
                                SET id_inquilino = @idInquilino,
                                    id_inmueble = @idInmueble,
                                    fecha_inicio = @fechaInicio,
                                    fecha_fin_original = @fechaFinOriginal,
-                                   monto_dia = @montoDia,
-                                   fecha_finalizacion_anticipada = @fechaFinalizacionAnticipada,
-                                   id_usuario_creacion = @idUsuarioCreacion,
-                                   id_usuario_finalizacion = @idUsuarioFinalizacion,
-                                   id_reserva_origen = @idReservaOrigen
-                               WHERE id_reserva = @id";
+                                   monto_dia = @montoDia
+                               WHERE id_reserva = @id
+                                 AND fecha_finalizacion_anticipada IS NULL";
 
-                using (var command = new MySqlCommand(sql, connection))
+                using (var command = new MySqlCommand(sql, connection, transaction))
                 {
                     command.Parameters.AddWithValue("@idInquilino", reserva.IdInquilino);
                     command.Parameters.AddWithValue("@idInmueble", reserva.IdInmueble);
                     command.Parameters.AddWithValue("@fechaInicio", reserva.FechaInicio);
                     command.Parameters.AddWithValue("@fechaFinOriginal", reserva.FechaFinOriginal);
                     command.Parameters.AddWithValue("@montoDia", reserva.MontoDia);
-                    command.Parameters.AddWithValue("@fechaFinalizacionAnticipada", (object?)reserva.FechaFinalizacionAnticipada ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@idUsuarioCreacion", (object?)reserva.IdUsuarioCreacion ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@idUsuarioFinalizacion", (object?)reserva.IdUsuarioFinalizacion ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@idReservaOrigen", (object?)reserva.IdReservaOrigen ?? DBNull.Value);
                     command.Parameters.AddWithValue("@id", reserva.IdReserva);
-
-                    connection.Open();
-
-                    res = command.ExecuteNonQuery();
+                    int res = command.ExecuteNonQuery();
+                    transaction.Commit();
+                    return res;
                 }
             }
-
-            return res;
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
         public IList<Reserva> ObtenerLista()
@@ -244,11 +271,15 @@ namespace Inmobiliaria.Models
             DateTime fechaFin,
             int? idReservaExcluir)
         {
-            bool existe = false;
+            using var connection = new MySqlConnection(connectionString);
+            connection.Open();
+            return ExisteSuperposicion(idInmueble, fechaInicio, fechaFin, idReservaExcluir, connection, null);
+        }
 
-            using (var connection = new MySqlConnection(connectionString))
-            {
-                string sql = @"SELECT COUNT(*)
+        private static bool ExisteSuperposicion(int idInmueble, DateTime fechaInicio,
+            DateTime fechaFin, int? idReservaExcluir, MySqlConnection connection, MySqlTransaction? transaction)
+        {
+            string sql = @"SELECT COUNT(*)
                                FROM Reserva
                                WHERE id_inmueble = @idInmueble
                                  AND fecha_inicio < @fechaFin
@@ -256,42 +287,102 @@ namespace Inmobiliaria.Models
                                  AND (@idReservaExcluir IS NULL
                                       OR id_reserva <> @idReservaExcluir)";
 
-                using (var command = new MySqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@idInmueble", idInmueble);
-                    command.Parameters.AddWithValue("@fechaInicio", fechaInicio);
-                    command.Parameters.AddWithValue("@fechaFin", fechaFin);
-                    command.Parameters.AddWithValue(
-                        "@idReservaExcluir",
-                        (object?)idReservaExcluir ?? DBNull.Value);
+            using (var command = new MySqlCommand(sql, connection, transaction))
+            {
+                command.Parameters.AddWithValue("@idInmueble", idInmueble);
+                command.Parameters.AddWithValue("@fechaInicio", fechaInicio);
+                command.Parameters.AddWithValue("@fechaFin", fechaFin);
+                command.Parameters.AddWithValue(
+                    "@idReservaExcluir",
+                    (object?)idReservaExcluir ?? DBNull.Value);
 
-                    connection.Open();
-
-                    existe = Convert.ToInt32(command.ExecuteScalar()) > 0;
-                }
+                return Convert.ToInt32(command.ExecuteScalar()) > 0;
             }
-
-            return existe;
         }
 
-        public int Finalizar(
-            int idReserva,
-            DateTime fechaFinalizacion,
-            int idUsuarioFinalizacion)
+        public int FinalizarConPago(Reserva reserva, DateTime fechaFinalizacion, Pago pagoMulta)
         {
             using var connection = new MySqlConnection(connectionString);
-            string sql = @"UPDATE Reserva
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                string sql = @"UPDATE Reserva
                            SET fecha_finalizacion_anticipada = @fechaFinalizacion,
                                id_usuario_finalizacion = @idUsuarioFinalizacion
                            WHERE id_reserva = @idReserva
-                             AND fecha_finalizacion_anticipada IS NULL";
+                             AND fecha_finalizacion_anticipada IS NULL
+                             AND fecha_inicio = @inicioOriginal
+                             AND fecha_fin_original = @finOriginal
+                             AND monto_dia = @montoOriginal
+                             AND id_inquilino = @inquilino
+                             AND id_inmueble = @inmueble";
 
-            using var command = new MySqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@fechaFinalizacion", fechaFinalizacion);
-            command.Parameters.AddWithValue("@idUsuarioFinalizacion", idUsuarioFinalizacion);
-            command.Parameters.AddWithValue("@idReserva", idReserva);
-            connection.Open();
-            return command.ExecuteNonQuery();
+                using var command = new MySqlCommand(sql, connection, transaction);
+                command.Parameters.AddWithValue("@fechaFinalizacion", fechaFinalizacion.Date);
+                command.Parameters.AddWithValue("@idUsuarioFinalizacion", pagoMulta.IdUsuarioCreacion);
+                command.Parameters.AddWithValue("@idReserva", reserva.IdReserva);
+                command.Parameters.AddWithValue("@inicioOriginal", reserva.FechaInicio.Date);
+                command.Parameters.AddWithValue("@finOriginal", reserva.FechaFinOriginal.Date);
+                command.Parameters.AddWithValue("@montoOriginal", reserva.MontoDia);
+                command.Parameters.AddWithValue("@inquilino", reserva.IdInquilino);
+                command.Parameters.AddWithValue("@inmueble", reserva.IdInmueble);
+                int filas = command.ExecuteNonQuery();
+                if (filas == 0)
+                {
+                    transaction.Rollback();
+                    return 0;
+                }
+                pagoMulta.IdReserva = reserva.IdReserva;
+                RepositorioPago.Insertar(pagoMulta, connection, transaction);
+                transaction.Commit();
+                return filas;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        private static Inmueble BloquearInmueble(int id, MySqlConnection connection, MySqlTransaction transaction)
+        {
+            // FOR UPDATE hace esperar otra reserva del mismo inmueble hasta terminar esta transacción.
+            using var command = new MySqlCommand(
+                "SELECT disponible, porcentaje_reserva FROM Inmueble WHERE id_inmueble = @id FOR UPDATE",
+                connection, transaction);
+            command.Parameters.AddWithValue("@id", id);
+            using var reader = command.ExecuteReader();
+            if (!reader.Read())
+                throw new InvalidOperationException("El inmueble seleccionado ya no existe");
+            return new Inmueble
+            {
+                IdInmueble = id,
+                Disponible = Convert.ToBoolean(reader["disponible"]),
+                PorcentajeReserva = Convert.ToDecimal(reader["porcentaje_reserva"])
+            };
+        }
+
+        private static void ValidarDatos(Reserva reserva)
+        {
+            if (reserva.FechaInicio.Year < 1000 || reserva.FechaFinOriginal.Date <= reserva.FechaInicio.Date ||
+                reserva.MontoDia <= 0 || reserva.MontoDia > 9999999999.99m || reserva.MontoDia != Math.Round(reserva.MontoDia, 2))
+                throw new InvalidOperationException("Revisá las fechas y el monto diario de la reserva");
+        }
+
+        private static void ValidarOrigen(Reserva reserva, MySqlConnection connection, MySqlTransaction transaction)
+        {
+            if (!reserva.IdReservaOrigen.HasValue)
+                return;
+            using var command = new MySqlCommand(@"SELECT id_inquilino, id_inmueble,
+                COALESCE(fecha_finalizacion_anticipada, fecha_fin_original) AS fin
+                FROM Reserva WHERE id_reserva = @id FOR UPDATE", connection, transaction);
+            command.Parameters.AddWithValue("@id", reserva.IdReservaOrigen.Value);
+            using var reader = command.ExecuteReader();
+            if (!reader.Read() || Convert.ToInt32(reader["id_inquilino"]) != reserva.IdInquilino ||
+                Convert.ToInt32(reader["id_inmueble"]) != reserva.IdInmueble ||
+                Convert.ToDateTime(reader["fin"]) > reserva.FechaInicio.Date)
+                throw new InvalidOperationException("La reserva original cambió. Volvé a iniciar la renovación desde su detalle.");
         }
 
         public IList<Reserva> ObtenerLista(

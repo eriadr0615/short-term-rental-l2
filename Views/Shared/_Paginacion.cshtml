@@ -4,6 +4,10 @@
     string? buscar = ViewBag.Buscar as string;
     int? idReserva = ViewBag.IdReserva as int?;
     bool? disponible = ViewBag.Disponible as bool?;
+    string? dni = ViewBag.Dni as string;
+    int? dias = ViewBag.Dias as int?;
+    string? fechaInicio = ViewBag.FechaInicio as string;
+    string? fechaFin = ViewBag.FechaFin as string;
 }
 
 @if (totalPaginas > 1)
@@ -15,7 +19,9 @@
                    asp-route-pagina="@(pagina - 1)"
                    asp-route-buscar="@buscar"
                    asp-route-idReserva="@idReserva"
-                   asp-route-disponible="@disponible">Anterior</a>
+                   asp-route-disponible="@disponible"
+                   asp-route-dni="@dni" asp-route-dias="@dias"
+                   asp-route-fechaInicio="@fechaInicio" asp-route-fechaFin="@fechaFin">Anterior</a>
             </li>
 
             @for (int numero = 1; numero <= totalPaginas; numero++)
@@ -25,7 +31,9 @@
                        asp-route-pagina="@numero"
                        asp-route-buscar="@buscar"
                        asp-route-idReserva="@idReserva"
-                       asp-route-disponible="@disponible">@numero</a>
+                       asp-route-disponible="@disponible"
+                       asp-route-dni="@dni" asp-route-dias="@dias"
+                       asp-route-fechaInicio="@fechaInicio" asp-route-fechaFin="@fechaFin">@numero</a>
                 </li>
             }
 
@@ -34,7 +42,9 @@
                    asp-route-pagina="@(pagina + 1)"
                    asp-route-buscar="@buscar"
                    asp-route-idReserva="@idReserva"
-                   asp-route-disponible="@disponible">Siguiente</a>
+                   asp-route-disponible="@disponible"
+                   asp-route-dni="@dni" asp-route-dias="@dias"
+                   asp-route-fechaInicio="@fechaInicio" asp-route-fechaFin="@fechaFin">Siguiente</a>
             </li>
         </ul>
     </nav>

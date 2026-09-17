@@ -60,12 +60,12 @@
 
             <div class="mb-3">
                 <label asp-for="MontoDia" class="form-label">Monto por día</label>
-                <input asp-for="MontoDia" class="form-control" />
+                <input asp-for="MontoDia" type="number" step="0.01" min="0.01" class="form-control" />
                 <span asp-validation-for="MontoDia" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <input type="submit" value="Continuar al pago inicial" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Volver</a>
             </div>
         </form>
@@ -81,7 +81,7 @@
             "#inquilino",
             "@Url.Action("Buscar", "Inquilinos")");
 
-        configurarBusquedaAjax(
+        const buscarInmueble = configurarBusquedaAjax(
             "#buscar-inmueble",
             "#inmueble",
             "@Url.Action("Buscar", "Inmueble")",
@@ -91,5 +91,8 @@
                     fechaFin: $("#FechaFinOriginal").val()
                 };
             });
+        $("#FechaInicio, #FechaFinOriginal").on("change", function () {
+            buscarInmueble(false);
+        });
     </script>
 }

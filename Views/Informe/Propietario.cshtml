@@ -6,6 +6,7 @@
 
 <div class="container mt-4">
     <h2 class="mb-4">Inmuebles por propietario</h2>
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
     @if (ViewBag.Error != null)
     {
         <div class="alert alert-danger">
@@ -81,6 +82,7 @@
             No se encontraron inmuebles para ese propietario
         </div>
     }
+    <partial name="_Paginacion" />
     <a asp-controller="Informe" asp-action="Index" class="btn btn-secondary">
         Volver
     </a>

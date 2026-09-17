@@ -1,4 +1,4 @@
-
+-- Script de creación e inicialización de la base de datos del proyecto.
 
 DROP DATABASE IF EXISTS reservas_temporales;
 CREATE DATABASE reservas_temporales

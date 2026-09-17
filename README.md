@@ -2,94 +2,170 @@
 
 ## Integrantes
 
-Erica Castro
--correo: erica.castro.0615@gmail.com
--usuario github: [eriadr0615](https://github.com/eriadr0615)
--usuario discord: erica_19340
+- Erica Castro
+  - Correo: erica.castro.0615@gmail.com
+  - GitHub: [eriadr0615](https://github.com/eriadr0615)
+  - Discord: erica_19340
+- Sebastian Castro
+  - Correo: castrosebastian87@gmail.com
+  - GitHub: [ssebasss](https://github.com/ssebasss)
 
-Sebastian Castro
--correo: castrosebastian87@gmail.com
--usuario github: [ssebasss](https://github.com/ssebasss)
+## Descripción y alcance
 
-## Descripcion
+Sistema web para administrar alquileres temporarios de una inmobiliaria, según la [narrativa del proyecto](./Narrativa_Proyecto_Reservas_Temporales.pdf).
 
-sistema web gestado para la administración de alquileres temporarios regentiado por una inmobiliaria.
+La implementación mantiene ASP.NET Core MVC, vistas Razor, repositorios con interfaces e inyección de dependencias, ADO.NET/MySqlConnector y autenticación por cookies. Las búsquedas de los formularios usan jQuery y JSON. No se incorporaron Entity Framework, JWT ni otro framework para esta entrega.
 
-### Modelado de datos
+### Primera entrega
 
-Esquema de modelo de datos perteneciente a la app:
+- Alta, baja y modificación de propietarios e inquilinos.
 
-#### Primera entrega :
+### Segunda entrega
 
-- alta, baja, modificación de entidad Propietario
-- alta, baja, modificacion de entidad Inquilinos
+- Alta, baja, modificación y detalle de inmuebles, tipos de inmueble y reservas.
+- Imágenes y portada de los inmuebles; cada inmueble pertenece a un propietario.
 
-#### Segunda entrega
+### Entrega final
 
-- alta, baja, modificación y detalle de inmuebles
-- administración de tipos de inmueble
-- alta, baja, modificación y detalle de reservas
+- Inicio y cierre de sesión; roles Administrador y Empleado.
+- Administración de usuarios por el Administrador; perfil, contraseña y avatar propios para ambos roles.
+- Eliminaciones reservadas al Administrador.
+- Confirmación de la reserva con la seña exigida por el inmueble.
+- Pagos por reserva: alta, consulta, edición del concepto y anulación lógica por el Administrador.
+- Finalización anticipada: fecha efectiva separada de la original, cálculo de multa y registro del pago.
+- Renovación como una reserva nueva, vinculada a la original, con nuevas fechas y monto diario.
+- Auditoría de creación/finalización de reservas y creación/anulación de pagos, visible al Administrador en los detalles.
+- Informes, paginado y búsquedas en el servidor; selección por búsqueda AJAX en los formularios relacionados.
 
-#### Entrega final
+La reserva y su seña se guardan en una misma transacción ADO.NET. Lo mismo ocurre con la finalización anticipada y su pago: si falla una operación, se revierte el conjunto. La disponibilidad vuelve a comprobarse al guardar.
 
-- inicio y cierre de sesión mediante cookies
-- autorización por roles Administrador y Empleado
-- administración de usuarios reservada al Administrador
-- edición del perfil, contraseña y avatar propios
-- eliminaciones reservadas al Administrador
-- registro y consulta de pagos asociados a reservas
-- modificación exclusiva del concepto del pago
-- anulación lógica de pagos por un Administrador, conservando la auditoría
-- finalización anticipada con cálculo y registro del pago de la multa
-- renovación mediante una reserva nueva, sin modificar la reserva original
-- paginado y búsquedas resueltas en el servidor
-- selección por búsqueda AJAX en los formularios relacionados
+Suspender un inmueble impide nuevas reservas, pero no modifica las existentes. Las bajas respetan las relaciones de la base: no se elimina un registro utilizado por otro. Anular un pago conserva su registro, por lo que también mantiene esa relación.
 
-#### Diagrama
+### Informes
 
-Diagrama de entidad relacion
+Desde el menú **Informes** se accede a:
 
-![Diagrama de Entidad Relación](./DER.png)
+1. Inmuebles con propietario, con filtro de disponibilidad.
+2. Inmuebles de un propietario, buscado por DNI.
+3. Inmuebles más reservados en el último año.
+4. Inmuebles sin reservas en los últimos X días (30 por defecto).
+5. Reservas vigentes.
+6. Reservas por terminar en los próximos X días (30 por defecto).
+7. Pagos de una reserva, con acceso a registrar otro pago.
+8. Inmuebles libres entre dos fechas.
 
-## Base de datos
+Los listados se consultan por páginas de 10 registros mediante `LIMIT/OFFSET`. Las búsquedas AJAX devuelven hasta 10 coincidencias; se puede refinar el texto. El pequeño catálogo de tipos se carga completo en el desplegable de inmuebles.
 
-### Configuración de la base de datos
+## Diagrama de entidad-relación
 
-El proyecto utiliza **MySQL** como motor de base de datos.
+El diagrama corresponde a las tablas y columnas de [reservas_temporales.sql](./reservas_temporales.sql). PK identifica la clave primaria; FK, una clave foránea; UK, un valor único. Los tamaños y valores por defecto están en el SQL.
 
-El archivo `reservas_temporales.sql`, ubicado en la raíz del proyecto, contiene las sentencias necesarias para crear e inicializar la base de datos.
-
-#### 1. Crear la base de datos
-
-Abrir MySQL Workbench o un app compatible con MySQL y ejecuta el archivo:
-
-```text
-reservas_temporales.sql
+```mermaid
+erDiagram
+    Propietario {
+        INT id_propietario PK
+        VARCHAR dni UK
+        VARCHAR nombre
+        VARCHAR apellido
+        VARCHAR telefono
+        VARCHAR correo
+        VARCHAR direccion
+    }
+    Inquilino {
+        INT id_inquilino PK
+        VARCHAR dni UK
+        VARCHAR nombre
+        VARCHAR apellido
+        VARCHAR telefono
+        VARCHAR correo
+        VARCHAR direccion
+    }
+    TipoInmueble {
+        INT id_tipo_inmueble PK
+        VARCHAR nombre_tipo UK
+    }
+    Usuario {
+        INT id_usuario PK
+        VARCHAR avatar
+        VARCHAR nombre_usuario
+        VARCHAR correo_usuario UK
+        VARCHAR contrasenia_hash
+        VARCHAR rol_usuario
+        BOOLEAN activo
+    }
+    Inmueble {
+        INT id_inmueble PK
+        INT id_propietario FK
+        VARCHAR direccion_inmueble
+        INT id_tipo_inmueble FK
+        VARCHAR coordenadas_inmuebles
+        DECIMAL precio_diario
+        DECIMAL porcentaje_reserva
+        BOOLEAN disponible
+        INT capacidad_maxima
+    }
+    Imagen_Inmueble {
+        INT id_imagen PK
+        INT id_inmueble FK
+        VARCHAR url_img
+        BOOLEAN es_principal
+    }
+    Reserva {
+        INT id_reserva PK
+        INT id_inquilino FK
+        INT id_inmueble FK
+        DATE fecha_inicio
+        DATE fecha_fin_original
+        DECIMAL monto_dia
+        DATE fecha_finalizacion_anticipada
+        INT id_usuario_creacion FK
+        INT id_usuario_finalizacion FK
+        INT id_reserva_origen FK
+    }
+    Pago {
+        INT id_pago PK
+        INT id_reserva FK
+        VARCHAR concepto
+        DATETIME fecha_pago
+        DECIMAL monto
+        VARCHAR estado
+        INT id_usuario_creacion FK
+        INT id_usuario_anulacion FK
+    }
+    Propietario ||--o{ Inmueble : id_propietario
+    TipoInmueble ||--o{ Inmueble : id_tipo_inmueble
+    Inmueble ||--o{ Imagen_Inmueble : id_inmueble
+    Inquilino ||--o{ Reserva : id_inquilino
+    Inmueble ||--o{ Reserva : id_inmueble
+    Usuario |o--o{ Reserva : id_usuario_creacion
+    Usuario |o--o{ Reserva : id_usuario_finalizacion
+    Reserva |o--o{ Reserva : id_reserva_origen
+    Reserva ||--o{ Pago : id_reserva
+    Usuario ||--o{ Pago : id_usuario_creacion
+    Usuario |o--o{ Pago : id_usuario_anulacion
 ```
 
-El script crea automáticamente la base de datos:
+`TipoInmueble` tiene dos columnas: `id_tipo_inmueble` y `nombre_tipo`. La relación está en `Inmueble.id_tipo_inmueble`; ni la dirección ni las coordenadas son claves foráneas. Una renovación referencia a la reserva original mediante `id_reserva_origen`.
 
-```text
-reservas_temporales
-```
+## Puesta en marcha
 
-y las tablas necesarias para el sistema.
+### Requisitos
 
-> Importante: el script contiene `DROP DATABASE IF EXISTS reservas_temporales`, por lo que volver a ejecutarlo elimina la base existente y la crea nuevamente!
+- SDK de .NET 10.
+- Servidor MySQL instalado y en ejecución.
+- MySQL Workbench u otro cliente para ejecutar el script.
 
-#### 2. Configurar la conexión
+### 1. Crear e inicializar la base
 
-Por seguridad, la contraseña de MySQL no se almacena en el repositorio.
+Abrir [reservas_temporales.sql](./reservas_temporales.sql) en MySQL Workbench y ejecutarlo en una instalación nueva. Crea la base `reservas_temporales`, sus ocho tablas y los datos iniciales.
 
-Abrir el archivo:
+> Atención: el script empieza con `DROP DATABASE IF EXISTS reservas_temporales`. Ejecutarlo otra vez borra la base existente y sus datos. No usarlo para actualizar una base con información que se quiera conservar.
 
-```text
-appsettings.json
-```
+La base ejecutada se guarda en el servidor MySQL, no dentro del repositorio. Git comparte el archivo SQL, pero un commit, push o pull no actualiza automáticamente la base local. Tampoco lo hace `dotnet run`. Si la base ya existe, primero se comparan los cambios necesarios y se hace una copia de respaldo.
 
-y modificar la cadena de conexión según el usuario y contraseña de MySQL de cada computadora.
+### 2. Configurar la conexión local
 
-Por ejemplo:
+Revisar `ConnectionStrings:DefaultConnection` en la configuración del proyecto y ajustar servidor, puerto, usuario y contraseña:
 
 ```json
 "ConnectionStrings": {
@@ -97,57 +173,44 @@ Por ejemplo:
 }
 ```
 
-> **OJO:** reemplazar `CAMBIAR_CLAVE` por la contraseña configurada en MySQL.
+En desarrollo, `appsettings.Development.json` puede sobrescribir `appsettings.json`. El proyecto también admite la configuración local de secretos de .NET. Usar credenciales de la instalación propia y no publicar contraseñas personales.
 
-Por ejemplo, si la contraseña es `123`:
+Agregar un archivo a `.gitignore` no deja de versionarlo si Git ya lo tenía registrado; revisar los cambios antes de compartir configuración local.
 
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost;Port=3306;Database=reservas_temporales;User=root;Password=123;SslMode=None;"
-}
-```
+### 3. Restaurar, compilar y ejecutar
 
-Si el usuario `root` no posee contraseña:
-
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost;Port=3306;Database=reservas_temporales;User=root;Password=;SslMode=None;"
-}
-```
-
-#### 3. Restaurar dependencias
-
-Desde una terminal ubicada en la carpeta del proyecto ejecutar:
+Desde la carpeta del proyecto:
 
 ```bash
 dotnet restore
-```
-
-Este comando descarga y restaura los paquetes necesarios para ejecutar el proyecto.
-
-#### 4. Ejecutar el proyecto
-
-En la misma terminal ejecutar:
-
-```bash
+dotnet build
 dotnet run
 ```
 
-La consola de la terminal, mostrará la dirección donde se está ejecutando la aplicación. Por ejemplo:
-
-```text
-http://localhost:5277
-```
-
-Listo! Con esa url ya podes ingresar a la aplicación desde el navegador.
+Abrir la URL que indique la consola, por ejemplo `http://localhost:5277`.
 
 ## Usuarios de prueba
 
-El script crea estos usuarios para comprobar los permisos:
+El script inicial crea estas cuentas:
 
 | Rol | Correo | Contraseña |
 | --- | --- | --- |
 | Administrador | `admin@inmobiliaria.com` | `Admin123!` |
 | Empleado | `empleado@inmobiliaria.com` | `Empleado123!` |
 
-Las contraseñas se guardan como hashes PBKDF2 con salt, no como texto plano.
+Las contraseñas se guardan como hashes PBKDF2 con salt. No hay registro público: el Administrador crea los usuarios desde el sistema.
+
+## Comprobaciones para la entrega
+
+Realizar las pruebas con datos de prueba:
+
+- Ingresar con ambos roles. Verificar que el Empleado no pueda administrar usuarios ajenos, eliminar entidades ni anular pagos, incluso entrando por URL.
+- Crear y editar propietarios, inquilinos y tipos. Repetir un DNI o nombre de tipo: debe aparecer el error en el formulario sin perder los datos ingresados.
+- Intentar eliminar entidades relacionadas: debe explicarse el impedimento y conservarse la información.
+- Verificar en el detalle de un inmueble su tipo, propietario, datos e imágenes.
+- Buscar en desplegables, cambiar rápidamente el texto y las fechas de una reserva: no deben reaparecer respuestas antiguas. Al editar, la selección existente se conserva y se valida nuevamente al guardar.
+- Crear una reserva con seña. Revisar que la vista previa no la guarde y que la confirmación registre reserva y pago juntos. Probar fechas superpuestas y un inmueble suspendido.
+- En pagos, verificar que solo se modifique el concepto y que los anulados sigan visibles.
+- Finalizar antes y después de la mitad de la estadía: comprobar respectivamente 50% y 25% del importe de los días restantes. Cambiar la fecha en la vista previa debe exigir recalcular. Verificar que no se duplique la finalización ni su pago.
+- Renovar: comprobar que la nueva reserva conserve inmueble e inquilino, tome las nuevas fechas y precio y no cambie la original.
+- Recorrer los ocho informes con resultados, sin resultados y filtros inválidos. Usar más de 10 registros y comprobar que el paginado conserve los filtros.

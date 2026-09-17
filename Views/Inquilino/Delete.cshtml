@@ -5,6 +5,7 @@
 }
 
 <h1>Eliminar inquilino</h1>
+<div asp-validation-summary="All" class="text-danger mb-3"></div>
 
 <h3> Seguro que desea eliminar este inquilino?</h3>
 <div>
@@ -24,7 +25,7 @@
         <dd class="col-sm-10">@Html.DisplayFor(model => model.Direccion)</dd>
     </dl>
 
-    <form asp-action="Delete" asp-route-id="@Model.IdInquilino">
+    <form asp-action="Delete" asp-route-id="@Model.IdInquilino" method="post">
         <input type="hidden" asp-for="IdInquilino" />
         <input type="submit" value="Eliminar" class="btn btn-danger" />
         <a asp-action="Index" class="btn btn-secondary">Volver</a>

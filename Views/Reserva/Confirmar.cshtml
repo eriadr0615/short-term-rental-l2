@@ -1,0 +1,51 @@
+@model Inmobiliaria.Models.ConfirmarReservaView
+@{
+    ViewData["Title"] = "Confirmar reserva y pago";
+    var inmueble = ViewBag.Inmueble as Inmobiliaria.Models.Inmueble;
+    var inquilino = ViewBag.Inquilino as Inmobiliaria.Models.Inquilino;
+}
+
+<h1>Confirmar reserva y pago inicial</h1>
+<div class="alert alert-info">
+    Todavía no se guardó la reserva. Al confirmar se registran juntos la reserva y el pago recibido.
+    Si cancelás, no se guarda ninguno.
+</div>
+<p><strong>Inquilino:</strong> @inquilino?.Nombre @inquilino?.Apellido</p>
+<p><strong>Inmueble:</strong> @inmueble?.DireccionInmueble</p>
+<p><strong>Período:</strong> @Model.Reserva.FechaInicio.ToString("dd/MM/yyyy") al @Model.Reserva.FechaFinOriginal.ToString("dd/MM/yyyy")</p>
+<p><strong>Monto diario:</strong> @Model.Reserva.MontoDia.ToString("C")</p>
+<p><strong>Seña mínima (@Model.PorcentajeReserva%):</strong> @Model.MontoMinimo.ToString("C")</p>
+@if (Model.Reserva.IdReservaOrigen.HasValue)
+{
+    <p>Renovación de la reserva #@Model.Reserva.IdReservaOrigen. La original no se modifica.</p>
+}
+
+<form asp-action="Confirmar" method="post" class="col-md-6">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <input asp-for="Reserva.IdInquilino" type="hidden" />
+    <input asp-for="Reserva.IdInmueble" type="hidden" />
+    <input asp-for="Reserva.FechaInicio" type="hidden" />
+    <input asp-for="Reserva.FechaFinOriginal" type="hidden" />
+    <input asp-for="Reserva.MontoDia" type="hidden" />
+    <input asp-for="Reserva.IdReservaOrigen" type="hidden" />
+    <div class="mb-3">
+        <label asp-for="Concepto" class="form-label">Concepto del pago</label>
+        <input asp-for="Concepto" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="MontoPago" class="form-label">Importe recibido</label>
+        <input asp-for="MontoPago" type="number" step="0.01" min="0" class="form-control" />
+        <span asp-validation-for="MontoPago" class="text-danger"></span>
+    </div>
+    @if (Model.PorcentajeReserva == 0)
+    {
+        <p>Este inmueble no exige seña. Si el importe es cero, no se genera un pago.</p>
+    }
+    <p>Confirmá únicamente si recibiste el importe indicado. La fecha del pago será la de este registro.</p>
+    <button type="submit" class="btn btn-primary">Confirmar reserva y registrar importe</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

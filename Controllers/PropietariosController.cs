@@ -1,6 +1,7 @@
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MySqlConnector;
 
 namespace Inmobiliaria.Controllers
 {
@@ -57,8 +58,20 @@ namespace Inmobiliaria.Controllers
         {
             if (ModelState.IsValid)
             {
-                repositorio.Alta(propietario);
-                return RedirectToAction("Index");
+                try
+                {
+                    propietario.Dni = propietario.Dni.Trim();
+                    repositorio.Alta(propietario);
+                    return RedirectToAction("Index");
+                }
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    ModelState.AddModelError(nameof(propietario.Dni), "Ya existe un propietario con ese DNI");
+                }
+                catch (MySqlException)
+                {
+                    ModelState.AddModelError("", "No se pudo guardar el propietario. Intentá nuevamente.");
+                }
             }
 
             return View(propietario);
@@ -80,10 +93,24 @@ namespace Inmobiliaria.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Propietario propietario)
         {
+            if (repositorio.ObtenerPorId(propietario.IdPropietario) == null)
+                return NotFound();
             if (ModelState.IsValid)
             {
-                repositorio.Modificacion(propietario);
-                return RedirectToAction("Index");
+                try
+                {
+                    propietario.Dni = propietario.Dni.Trim();
+                    repositorio.Modificacion(propietario);
+                    return RedirectToAction("Index");
+                }
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    ModelState.AddModelError(nameof(propietario.Dni), "Ya existe un propietario con ese DNI");
+                }
+                catch (MySqlException)
+                {
+                    ModelState.AddModelError("", "No se pudo modificar el propietario. Intentá nuevamente.");
+                }
             }
 
             return View(propietario);
@@ -107,8 +134,22 @@ namespace Inmobiliaria.Controllers
         [Authorize(Policy = Usuario.RolAdministrador)]
         public IActionResult EliminarConfirmado(int id)
         {
-            repositorio.Baja(id);
-            return RedirectToAction("Index");
+            var propietario = repositorio.ObtenerPorId(id);
+            if (propietario == null) return NotFound();
+            try
+            {
+                repositorio.Baja(id);
+                return RedirectToAction("Index");
+            }
+            catch (MySqlException ex) when (ex.Number == 1451)
+            {
+                ModelState.AddModelError("", "No se puede eliminar este propietario porque tiene inmuebles asociados");
+            }
+            catch (MySqlException)
+            {
+                ModelState.AddModelError("", "No se pudo eliminar el propietario. Intentá nuevamente.");
+            }
+            return View("Eliminar", propietario);
         }
         public IActionResult Details(int id)
         {

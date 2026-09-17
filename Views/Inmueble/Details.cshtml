@@ -5,6 +5,7 @@
     <h2 class="mb-4">Características del inmueble</h2>
     @{
         var imagenes = ViewBag.Imagenes as IList<ImagenInmueble>;
+        var propietario = ViewBag.Propietario as Propietario;
     }
 
     <div class="row g-4">
@@ -26,6 +27,17 @@
                     <p>
                         <strong>Dirección:</strong>
                         @Model.DireccionInmueble
+                    </p>
+
+                    <p>
+                        <strong>Propietario:</strong>
+                        @if (propietario != null)
+                        {
+                            <a asp-controller="Propietarios" asp-action="Details"
+                               asp-route-id="@propietario.IdPropietario">
+                                @propietario.Nombre @propietario.Apellido - DNI @propietario.Dni
+                            </a>
+                        }
                     </p>
 
                     <p>
