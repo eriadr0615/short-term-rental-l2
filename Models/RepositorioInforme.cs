@@ -160,16 +160,87 @@ namespace Inmobiliaria.Models
             return lista;
         }
 
+        public IList<InformeInmueble> InmueblesSinReserva(int dias)
+        {
+            IList<InformeInmueble> lista = new List<InformeInmueble>();
 
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"
+            SELECT
+                i.id_inmueble,
+                i.direccion_inmueble,
+                i.precio_diario,
+                i.capacidad_maxima,
+                i.disponible,
+                p.nombre,
+                p.apellido,
+                t.nombre_tipo
+            FROM Inmueble i
+            INNER JOIN Propietario p
+                ON i.id_propietario = p.id_propietario
+            INNER JOIN TipoInmueble t
+                ON i.id_tipo_inmueble = t.id_tipo_inmueble
+            WHERE NOT EXISTS
+            (
+                SELECT 1
+                FROM Reserva r
+                WHERE r.id_inmueble = i.id_inmueble
+                AND r.fecha_inicio >= DATE_SUB(CURDATE(), INTERVAL @dias DAY)
+                AND r.fecha_inicio <= CURDATE()
+            )
+            ORDER BY i.direccion_inmueble";
 
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@dias", dias);
+
+                    connection.Open();
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            InformeInmueble informe = new InformeInmueble
+                            {
+                                IdInmueble =
+                                    Convert.ToInt32(reader["id_inmueble"]),
+
+                                Direccion =
+                                    reader["direccion_inmueble"].ToString() ?? "",
+
+                                Propietario =
+                                    $"{reader["nombre"]} {reader["apellido"]}",
+
+                                TipoInmueble =
+                                    reader["nombre_tipo"].ToString() ?? "",
+
+                                PrecioDiario =
+                                    Convert.ToDecimal(reader["precio_diario"]),
+
+                                CapacidadMaxima =
+                                    Convert.ToInt32(reader["capacidad_maxima"]),
+
+                                Disponible =
+                                    Convert.ToBoolean(reader["disponible"])
+                            };
+
+                            lista.Add(informe);
+                        }
+                    }
+                }
+            }
+
+            return lista;
+        }
 
 
         public IList<InformeInmueble> InmueblesPorPropietario(string dni)
+        {
+            IList<InformeInmueble> lista = new List<InformeInmueble>();
+            using (var connection = new MySqlConnection(connectionString))
             {
-                IList<InformeInmueble> lista = new List<InformeInmueble>(); 
-                using (var connection = new MySqlConnection(connectionString))
-                {
-                    string sql = @"
+                string sql = @"
                         SELECT
                             i.id_inmueble,
                         
@@ -188,43 +259,44 @@ namespace Inmobiliaria.Models
                         WHERE p.dni = @dni
                         ORDER BY i.direccion_inmueble";
 
-                    using (var command = new MySqlCommand(sql, connection))
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@dni", dni);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
                     {
-                        command.Parameters.AddWithValue("@dni", dni);
-                        connection.Open();
-                        using (var reader = command.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
+                            InformeInmueble informe = new InformeInmueble
                             {
-                                InformeInmueble informe = new InformeInmueble
-                                {
-                                    IdInmueble =
-                                        Convert.ToInt32(reader["id_inmueble"]),
-                                    Direccion =
-                                        reader["direccion_inmueble"].ToString() ?? "",
-                                    Propietario =
-                                        $"{reader["nombre"]} {reader["apellido"]}",
-                                    TipoInmueble =
-                                        reader["nombre_tipo"].ToString() ?? "",
-                                    PrecioDiario =
-                                        Convert.ToDecimal(reader["precio_diario"]),
-                                    CapacidadMaxima =
-                                        Convert.ToInt32(reader["capacidad_maxima"]),
-                                    Disponible =
-                                        Convert.ToBoolean(reader["disponible"])
-                                        };
+                                IdInmueble =
+                                    Convert.ToInt32(reader["id_inmueble"]),
+                                Direccion =
+                                    reader["direccion_inmueble"].ToString() ?? "",
+                                Propietario =
+                                    $"{reader["nombre"]} {reader["apellido"]}",
+                                TipoInmueble =
+                                    reader["nombre_tipo"].ToString() ?? "",
+                                PrecioDiario =
+                                    Convert.ToDecimal(reader["precio_diario"]),
+                                CapacidadMaxima =
+                                    Convert.ToInt32(reader["capacidad_maxima"]),
+                                Disponible =
+                                    Convert.ToBoolean(reader["disponible"])
+                            };
 
-                                lista.Add(informe);
-                            }
+                            lista.Add(informe);
                         }
                     }
                 }
-                return lista;
             }
+            return lista;
+        }
     }
-    
-
-        
 
 
 }
+
+
+
+

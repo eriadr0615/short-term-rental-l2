@@ -14,6 +14,9 @@ namespace Inmobiliaria.Controllers
             this.repositorio = repositorio;
         }
 
+
+
+
         public IActionResult Index(int pagina = 1, string? buscar = null)
         {
             const int tamanoPagina = 10;
@@ -43,6 +46,8 @@ namespace Inmobiliaria.Controllers
             return Json(resultado);
         }
 
+
+
         public IActionResult Details(int id)
         {
             var inquilino = repositorio.ObtenerPorId(id);
@@ -53,6 +58,9 @@ namespace Inmobiliaria.Controllers
             }
             return View("~/Views/Inquilino/Details.cshtml", inquilino);
         }
+
+
+
 
         public IActionResult Create()
         {
@@ -79,7 +87,7 @@ namespace Inmobiliaria.Controllers
             {
                 return NotFound();
             }
-            return View("~/Views/Inquilino/Edit.cshtml", inquilino);    
+            return View("~/Views/Inquilino/Edit.cshtml", inquilino);
         }
 
         [HttpPost]
