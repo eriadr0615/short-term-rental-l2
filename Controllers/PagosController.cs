@@ -257,34 +257,69 @@ namespace Inmobiliaria.Controllers
 
         private void CargarDetalle(Pago pago)
         {
-            ViewBag.Reserva = repositorioReserva.ObtenerPorId(pago.IdReserva);
+            Reserva? reserva =
+                repositorioReserva.ObtenerPorId(pago.IdReserva);
+
+            ViewBag.Reserva = reserva;
+
+            if (reserva != null)
+            {
+                int cantidadDias =
+                    (reserva.FechaFinOriginal.Date -
+                     reserva.FechaInicio.Date).Days;
+
+                ViewBag.CantidadDias = cantidadDias;
+
+                ViewBag.MontoDiaReserva =
+                    reserva.MontoDia;
+
+                ViewBag.TotalReserva =
+                    cantidadDias * reserva.MontoDia;
+            }
+
             if (User.IsInRole(Usuario.RolAdministrador))
             {
-                ViewBag.Usuarios = repositorioUsuario.ObtenerLista();
+                ViewBag.Usuarios =
+                    repositorioUsuario.ObtenerLista();
             }
         }
 
         private void ConfigurarPagoInicial(
-            Pago pago,
-            Reserva reserva,
-            bool completarValores = true)
+                    Pago pago,
+                    Reserva reserva,
+                    bool completarValores = true)
         {
-            decimal? montoMinimo = ObtenerMontoMinimoInicial(reserva);
-            if (!montoMinimo.HasValue)
+            Inmueble? inmueble =
+                repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
+            int cantidadDias =
+                (reserva.FechaFinOriginal.Date - reserva.FechaInicio.Date).Days;
+            decimal totalReserva =
+                cantidadDias * reserva.MontoDia;
+            decimal totalPagado =
+                repositorio.ObtenerPorReserva(reserva.IdReserva)
+                .Where(p => p.Estado == Pago.EstadoActivo)
+                .Sum(p => p.Monto);
+            ViewBag.TotalReserva = totalReserva;
+            ViewBag.TotalPagado = totalPagado;
+            ViewBag.SaldoPendiente =
+                totalReserva - totalPagado;
+            decimal? montoMinimo =
+                ObtenerMontoMinimoInicial(reserva);
+            if (montoMinimo.HasValue)
             {
-                return;
-            }
+                ViewBag.MontoMinimo =
+                    montoMinimo.Value;
+                ViewBag.PorcentajeReserva =
+                    inmueble?.PorcentajeReserva;
 
-            Inmueble? inmueble = repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
-            ViewBag.MontoMinimo = montoMinimo.Value;
-            ViewBag.PorcentajeReserva = inmueble?.PorcentajeReserva;
-
-            if (completarValores)
-            {
-                pago.Concepto = "Seña inicial";
-                pago.Monto = montoMinimo.Value;
+                if (completarValores)
+                {
+                    pago.Concepto = "Seña inicial";
+                    pago.Monto = montoMinimo.Value;
+                }
             }
         }
+
 
         private decimal? ObtenerMontoMinimoInicial(Reserva reserva)
         {

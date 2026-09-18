@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Inmobiliaria.Models
 {
-    // Datos del formulario de confirmación; no agrega columnas a la base de datos.
+
     public class ConfirmarReservaView
     {
         public Reserva Reserva { get; set; } = new Reserva();
@@ -13,9 +13,13 @@ namespace Inmobiliaria.Models
 
         [Range(0, 9999999999.99, ErrorMessage = "El importe no puede ser negativo ni superar el límite permitido")]
         public decimal MontoPago { get; set; }
+        public decimal MontoTotal { get; set; }
 
         public decimal PorcentajeReserva { get; set; }
         public decimal MontoMinimo { get; set; }
+        public decimal SaldoRestante { get; set; }
+
+
     }
 
     public class FinalizarReservaView
@@ -47,5 +51,6 @@ namespace Inmobiliaria.Models
 
         [Range(0.01, 9999999999.99, ErrorMessage = "El monto diario debe ser mayor que cero")]
         public decimal MontoDia { get; set; }
+
     }
 }

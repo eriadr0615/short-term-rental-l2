@@ -19,6 +19,14 @@
 {
     <p>Renovación de la reserva #@Model.Reserva.IdReservaOrigen. La original no se modifica.</p>
 }
+<p>
+    <strong>Total de la reserva:</strong>
+    @Model.MontoTotal.ToString("C")
+</p>
+<p>
+    <strong>Saldo luego del pago:</strong>
+    @Model.SaldoRestante.ToString("C")
+</p>
 
 <form asp-action="Confirmar" method="post" class="col-md-6">
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
@@ -41,9 +49,9 @@
     {
         <p>Este inmueble no exige seña. Si el importe es cero, no se genera un pago.</p>
     }
-    <p>Confirmá únicamente si recibiste el importe indicado. La fecha del pago será la de este registro.</p>
+    <p>Confirma únicamente si recibiste el importe indicado. La fecha del pago será la de este registro </p>
     <button type="submit" class="btn btn-primary">Confirmar reserva y registrar importe</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
 </form>
 
 @section Scripts {

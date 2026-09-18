@@ -55,12 +55,25 @@ namespace Inmobiliaria.Controllers
             }
 
             var resultado = repositorio.BuscarDisponibles(
-                    q, fechaInicio, fechaFin, idReservaExcluir, 10)
-                .Select(i => new
-                {
-                    id = i.IdInmueble,
-                    texto = i.DireccionInmueble
-                });
+        q, fechaInicio, fechaFin, idReservaExcluir, 10)
+    .Select(i =>
+    {
+        var propietario =
+            repositorioPropietario.ObtenerPorId(i.IdPropietario);
+
+        var tipo =
+            repositorioTipoInmueble.ObtenerPorId(i.IdTipoInmueble);
+        //ampliacion de txt en cuadro de bsuqueda, sino es imposible recordar la dire del inmueble. Se amplia la bsuq a los atributos
+        return new
+        {
+            id = i.IdInmueble,
+            texto =
+                        $"{i.DireccionInmueble} - " +
+                        $"{tipo?.NombreTipo} - " +
+                        $"{propietario?.Nombre} {propietario?.Apellido}",
+                         precio = i.PrecioDiario
+        };
+    });
             return Json(resultado);
         }
 

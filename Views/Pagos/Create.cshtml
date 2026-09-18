@@ -6,7 +6,6 @@
 }
 
 <h1>Registrar pago</h1>
-
 @if (ViewBag.MontoMinimo != null)
 {
     <div class="alert alert-info">
@@ -17,14 +16,33 @@
 
 <div class="row">
     <div class="col-md-7">
+        @if (ViewBag.TotalReserva != null)
+        {
+            <div class="alert alert-secondary">
+                <div>
+                    <strong>Total de la reserva:</strong>
+                    @(((decimal)ViewBag.TotalReserva).ToString("C"))
+                </div>
+
+                <div>
+                    <strong>Total pagado:</strong>
+                    @(((decimal)ViewBag.TotalPagado).ToString("C"))
+                </div>
+
+                <div>
+                    <strong>Saldo pendiente:</strong>
+                    @(((decimal)ViewBag.SaldoPendiente).ToString("C"))
+                </div>
+            </div>
+        }
+
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
                 <label asp-for="IdReserva" class="form-label">Reserva</label>
                 <input id="buscar-reserva" class="form-control mb-1"
-                       placeholder="Buscar por número, inquilino, DNI o inmueble"
-                       autocomplete="off" />
+                       placeholder="Buscar por número, inquilino, DNI o inmueble" autocomplete="off" />
                 <select asp-for="IdReserva" id="reserva" class="form-select">
                     <option value="0">Seleccione una reserva</option>
                     @if (reservaActual != null)
@@ -45,7 +63,8 @@
 
             <div class="mb-3">
                 <label asp-for="FechaPago" class="form-label">Fecha de pago</label>
-                <input asp-for="FechaPago" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control" />
+                <input asp-for="FechaPago" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local"
+                       class="form-control" />
                 <span asp-validation-for="FechaPago" class="text-danger"></span>
             </div>
 

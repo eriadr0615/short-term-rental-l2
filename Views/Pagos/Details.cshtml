@@ -32,7 +32,27 @@
 
     <dt class="col-sm-3">Período de la reserva</dt>
     <dd class="col-sm-9">
-        @(reserva == null ? "No encontrado" : $"{reserva.FechaInicio:dd/MM/yyyy} al {reserva.FechaFinOriginal:dd/MM/yyyy}")
+        @(reserva == null ? "No encontrado" : $"{reserva.FechaInicio:dd/MM/yyyy} al        {reserva.FechaFinOriginal:dd/MM/yyyy}")
+        @if (reserva != null)
+        {
+            <dt class="col-sm-3">Precio por día reservado</dt>
+            <dd class="col-sm-9">
+                @(((decimal)ViewBag.MontoDiaReserva).ToString("C"))
+            </dd>
+
+            <dt class="col-sm-3">Cantidad de dias</dt>
+            <dd class="col-sm-9">
+                @ViewBag.CantidadDias
+            </dd>
+
+            <dt class="col-sm-3">Total de la reserva</dt>
+            <dd class="col-sm-9">
+
+                @(((decimal)ViewBag.TotalReserva).ToString("C"))
+
+            </dd>
+        }
+
     </dd>
 
     <dt class="col-sm-3">Concepto</dt>

@@ -40,13 +40,23 @@
                 }
 
                 solicitud = $.get(url, parametros, function (datos) {
-                    // Una respuesta anterior no debe reemplazar los resultados actuales.
+
                     if (versionActual !== version) return;
                     limpiarOpciones(true);
                     const valorSeleccionado = selector.val();
                     datos.forEach(function (item) {
                         if (String(item.id) !== valorSeleccionado) {
-                            selector.append(new Option(item.texto, item.id));
+                            const opcion =
+                                $("<option>")
+                                    .val(item.id)
+                                    .text(item.texto);
+
+                            if (item.precio !== undefined) {
+                                opcion.attr("data-precio", item.precio);
+                            }
+
+                            selector.append(opcion);
+
                         }
                     });
                     estado.text(datos.length === 0
@@ -54,7 +64,7 @@
                         : (datos.length === 10 ? "Se muestran hasta 10 resultados. Refiná la búsqueda si hace falta." : ""));
                 }).fail(function (_, motivo) {
                     if (versionActual !== version || motivo === "abort") return;
-                    estado.text("No se pudo completar la búsqueda. Volvé a intentarlo.");
+                    estado.text("No se pudo completar la búsqueda. Volvé a intentarlo");
                 });
             }, 300);
         }

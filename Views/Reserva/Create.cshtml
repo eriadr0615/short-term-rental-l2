@@ -16,8 +16,8 @@
 
             <div class="mb-3">
                 <label class="form-label">Inquilino</label>
-                <input id="buscar-inquilino" class="form-control mb-1"
-                       placeholder="Buscar por nombre, apellido o DNI" autocomplete="off" />
+                <input id="buscar-inquilino" class="form-control mb-1" placeholder="Buscar por nombre, apellido o DNI"
+                       autocomplete="off" />
                 <select asp-for="IdInquilino" id="inquilino" class="form-select">
                     <option value="">Seleccione un inquilino</option>
                     @if (inquilinoActual != null)
@@ -32,8 +32,8 @@
 
             <div class="mb-3">
                 <label class="form-label">Inmueble</label>
-                <input id="buscar-inmueble" class="form-control mb-1"
-                       placeholder="Buscar por dirección" autocomplete="off" />
+                <input id="buscar-inmueble" class="form-control mb-1" placeholder="Buscar por dirección"
+                       autocomplete="off" />
                 <select asp-for="IdInmueble" id="inmueble" class="form-select">
                     <option value="">Seleccione un inmueble</option>
                     @if (inmuebleActual != null)
@@ -93,6 +93,17 @@
             });
         $("#FechaInicio, #FechaFinOriginal").on("change", function () {
             buscarInmueble(false);
+        });
+        $("#inmueble").on("change", function () {
+
+            const precio =
+                $(this)
+                    .find("option:selected")
+                    .data("precio");
+
+            if (precio !== undefined) {
+                $("#MontoDia").val(precio);
+            }
         });
     </script>
 }

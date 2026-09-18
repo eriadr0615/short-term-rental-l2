@@ -2,11 +2,35 @@
     ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Inmobiliaria Soñada</h1>
+<div class="text-center bg-light rounded p-4">
+    <h1 class=" card-body text-center p-5 text-succes">Inmobiliaria Soñada</h1>
     @if (User.Identity?.IsAuthenticated == true)
     {
-        <p>Bienvenido, @(User.FindFirst("FullName")?.Value ?? User.Identity.Name).</p>
+        <div class="container mt-5">
+            <div class="card shadow-sm border-0">
+
+              
+                <p class="lead mb-2">
+                    Bienvenido, @User.Identity?.Name.
+                </p>
+
+                <div class="bd-info-subtle">
+                    Sistema de gestión de alquileres temporarios.
+                </div>
+
+                <p class="text-muted">
+                    Desde el menú superior puede administrar propietarios,
+                    inquilinos, inmuebles, reservas, pagos e informes.
+                </p>
+
+                <span class="bg-success-subtle text-primary-emphasis  rounded">
+                    Rol: @(User.IsInRole("Administrador") ? "Administrador" : "Empleado")
+                </span>
+
+            </div>
+        </div>
+
+        
     }
     else
     {

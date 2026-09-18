@@ -174,9 +174,7 @@ namespace Inmobiliaria.Controllers
 
             if (reserva.FechaFinalizacionAnticipada.HasValue)
                 return ReservaNoEditable(reserva.IdReserva);
-
             CargarSeleccionesReserva(reserva);
-
             return View("~/Views/Reserva/Edit.cshtml", reserva);
         }
 

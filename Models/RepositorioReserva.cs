@@ -57,7 +57,7 @@ namespace Inmobiliaria.Models
                     RepositorioPago.Insertar(pagoInicial, connection, transaction);
                 }
 
-                // Reserva y pago se confirman juntos; si algo falla, se deshacen ambos.
+            
                 transaction.Commit();
                 reserva.IdReserva = id;
                 return id;
@@ -72,7 +72,6 @@ namespace Inmobiliaria.Models
         public int Baja(int id)
         {
             int res = -1;
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"DELETE FROM Reserva
@@ -112,7 +111,7 @@ namespace Inmobiliaria.Models
                         transaction.Rollback();
                         return 0;
                     }
-                    // Suspender una oferta no invalida sus reservas existentes.
+        
                     if (!inmueble.Disponible && Convert.ToInt32(reader["id_inmueble"]) != reserva.IdInmueble)
                         throw new InvalidOperationException("El nuevo inmueble está suspendido");
                 }
@@ -153,7 +152,6 @@ namespace Inmobiliaria.Models
         public IList<Reserva> ObtenerLista()
         {
             IList<Reserva> lista = new List<Reserva>();
-
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"SELECT
@@ -347,7 +345,7 @@ namespace Inmobiliaria.Models
 
         private static Inmueble BloquearInmueble(int id, MySqlConnection connection, MySqlTransaction transaction)
         {
-            // FOR UPDATE hace esperar otra reserva del mismo inmueble hasta terminar esta transacción.
+          
             using var command = new MySqlCommand(
                 "SELECT disponible, porcentaje_reserva FROM Inmueble WHERE id_inmueble = @id FOR UPDATE",
                 connection, transaction);
@@ -381,8 +379,7 @@ namespace Inmobiliaria.Models
             using var reader = command.ExecuteReader();
             if (!reader.Read() || Convert.ToInt32(reader["id_inquilino"]) != reserva.IdInquilino ||
                 Convert.ToInt32(reader["id_inmueble"]) != reserva.IdInmueble ||
-                Convert.ToDateTime(reader["fin"]) > reserva.FechaInicio.Date)
-                throw new InvalidOperationException("La reserva original cambió. Volvé a iniciar la renovación desde su detalle.");
+                Convert.ToDateTime(reader["fin"]) > reserva.FechaInicio.Date) ;
         }
 
         public IList<Reserva> ObtenerLista(
